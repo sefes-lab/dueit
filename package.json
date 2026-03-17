@@ -1,0 +1,13 @@
+{
+  "name": "dueit",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "test": "vitest --run"
+  },
+  "devDependencies": {
+    "fast-check": "^4.6.0",
+    "vitest": "^4.1.0"
+  }
+}

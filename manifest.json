@@ -1,0 +1,14 @@
+{
+  "name": "DueIt — Homework Planner",
+  "short_name": "DueIt",
+  "description": "A simple homework planner for students",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f6f8",
+  "theme_color": "#4a6cf7",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "icons/icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

@@ -1,0 +1,76 @@
+# DueIt — Version History
+
+## v0.4 — 2026-03-16
+
+- Calendar view toggle (📅/📋) in Assignment Tracker
+- Monthly calendar grid with colored dots on days with assignments
+- Test/Quiz days highlighted with red tint and outlined dots
+- Hover tooltips show assignment details for each day
+- Month navigation (previous/next) with today indicator
+- Legend for test vs regular assignment dots
+
+## v0.31 — 2026-03-16
+
+- Assignment type label shown after class name in tracker meta line (e.g. "Math Test", "Spanish Homework")
+- Tests/Quizzes do not get strikethrough styling when marked as Studied
+
+## v0.3 — 2026-03-16
+
+- Assignment type selector: 📝 Homework, 📋 Test/Quiz, 📖 Reading, 🎨 Project
+- Tests/Quizzes get a "📖 Studied" toggle instead of Done/Turn In
+- Type icons shown on assignment cards and in print view
+- Type dropdown shares a row with the Assignment text field
+
+## v0.2 — 2026-03-16
+
+- 6 accent color schemes (blue, coral, teal, purple, orange, green) — pick in Settings
+- Confetti burst animation when turning in an assignment
+- 🔥 Turn-in streak counter banner (2+ consecutive days)
+- Class-colored left border and dot on assignment cards
+- Due-tomorrow and due-today urgency glow (pulsing border)
+- Fun random empty state messages with emoji
+
+## v0.16 — 2026-03-16
+
+- Track timestamps when assignments are marked Done and Turned In
+- Print view includes Done and Turned In date columns (date only, no time)
+
+## v0.15 — 2026-03-16
+
+- Turn In button only appears after assignment is marked Done
+- Undoing Done also clears Turn In status
+- Clearer button icons: 👍 Done / 🫴 Turn In
+
+## v0.14 — 2026-03-16
+
+- Countdown days remaining now based on local timezone instead of UTC
+
+## v0.13 — 2026-03-16
+
+- Class dropdown default changed from "Unclassified" to "Select" placeholder
+
+## v0.12 — 2026-03-16
+
+- Removed Description field from assignment form
+- Renamed "Title" label to "Assignment"
+
+## v0.11 — 2026-03-16
+
+- Print assignments via browser print dialog (🖨️ button)
+- Student profile (name, grade) stored in preferences
+- Default classes seeded on first run (Spanish, Language Arts, US History, Choir, Math, Science)
+- Personalized header: "<First Name>'s DueIt"
+- Class and Due Date fields share a row at the top of the form
+
+## v0.1 — 2026-03-16
+
+Initial release.
+
+- Assignment CRUD (create, edit, delete)
+- Progress tracking with completion and turn-in status
+- Class management via editable dropdown
+- Persistent assignment tracker with due date countdown (by days)
+- Responsive layout for mobile and desktop
+- JSON export/import for data portability
+- Dark/light mode toggle
+- localStorage persistence
