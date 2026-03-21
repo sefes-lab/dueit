@@ -3,6 +3,7 @@
 
 /* ===== Light Theme (default) ===== */
 :root {
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --clr-bg: #f4f6f8;
   --clr-surface: #ffffff;
   --clr-primary: #4a6cf7;
@@ -234,6 +235,11 @@
 
 /* ===== Color Picker Swatches ===== */
 .color-picker { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+#font-picker {
+  font-size: 0.8rem; padding: 0.2rem 0.4rem; border-radius: var(--radius);
+  border: 1px solid var(--clr-border); background: var(--clr-input-bg);
+  color: var(--clr-text); cursor: pointer; font-family: var(--font-family);
+}
 .color-swatch {
   width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent;
   cursor: pointer; transition: border-color 0.15s, transform 0.15s;
@@ -243,7 +249,7 @@
 .color-swatch.active { border-color: var(--clr-text); }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-family);
   background: var(--clr-bg);
   color: var(--clr-text);
   line-height: 1.5;

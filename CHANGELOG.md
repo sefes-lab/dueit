@@ -1,5 +1,17 @@
 # DueIt — Version History
 
+## v0.57 — 2026-03-20
+
+- Font picker in Settings header: choose from 6 fonts
+  - System Default (clean sans-serif)
+  - Nunito (rounded, friendly)
+  - Patrick Hand (neat handwriting)
+  - Baloo 2 (chunky, playful)
+  - Quicksand (geometric, modern)
+  - Comic Neue (casual, approachable)
+- Fonts load from Google Fonts on demand (no extra weight for unused fonts)
+- Font preference saved to localStorage
+
 ## v0.56 — 2026-03-20
 
 - Calendar sync: 🔄 button in header exports all pending assignments as a single `.ics` file

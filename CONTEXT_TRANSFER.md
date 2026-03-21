@@ -10,7 +10,7 @@ DueIt is a homework planner PWA for a middle school student (April Shterling, Gr
 - GitHub Pages: `https://sefes-lab.github.io/dueit/`
 - License: All Rights Reserved (proprietary)
 
-## Current Version: 0.56
+## Current Version: 0.57
 
 ## Tech Stack
 - Plain HTML5 + CSS + JS (no build step, no framework)

@@ -1,9 +1,15 @@
 var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {};
 (typeof globalThis !== 'undefined' ? globalThis : window).DueIt = DueIt;
 
-DueIt.APP_VERSION = '0.56';
+DueIt.APP_VERSION = '0.57';
 
 DueIt.VERSION_HISTORY = [
+  {
+    version: '0.57',
+    date: '2026-03-20',
+    description:
+      'Font picker: choose from 6 fonts in Settings (System Default, Nunito, Patrick Hand, Baloo 2, Quicksand, Comic Neue); fonts load from Google Fonts on demand; preference saved',
+  },
   {
     version: '0.56',
     date: '2026-03-20',

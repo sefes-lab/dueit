@@ -124,6 +124,37 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     }
     persist();
   }
+  var FONT_MAP = {
+      'system':       { family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', url: null },
+      'nunito':       { family: '"Nunito", sans-serif',       url: 'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap' },
+      'patrick-hand': { family: '"Patrick Hand", cursive',    url: 'https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap' },
+      'baloo-2':      { family: '"Baloo 2", cursive',         url: 'https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&display=swap' },
+      'quicksand':    { family: '"Quicksand", sans-serif',    url: 'https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap' },
+      'comic-neue':   { family: '"Comic Neue", cursive',      url: 'https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap' },
+    };
+
+    function applyFont(fontKey) {
+      var font = FONT_MAP[fontKey];
+      if (!font) { fontKey = 'system'; font = FONT_MAP.system; }
+
+      // Load Google Font if needed
+      if (font.url) {
+        var linkId = 'gfont-' + fontKey;
+        if (!document.getElementById(linkId)) {
+          var link = document.createElement('link');
+          link.id = linkId;
+          link.rel = 'stylesheet';
+          link.href = font.url;
+          document.head.appendChild(link);
+        }
+      }
+
+      document.documentElement.style.setProperty('--font-family', font.family);
+      state.preferences.font = fontKey;
+      var picker = document.getElementById('font-picker');
+      if (picker) picker.value = fontKey;
+      persist();
+    }
 
   function getClassColor(className) {
     var idx = state.classes.indexOf(className);
@@ -633,6 +664,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     loadState();
     applyTheme(state.preferences.theme || 'light');
     applyAccent(state.preferences.accent || 'blue');
+    applyFont(state.preferences.font || 'system');
     renderAll();
     document.getElementById('footer-version').textContent = 'DueIt v' + DueIt.APP_VERSION;
 
@@ -666,11 +698,16 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
       if (swatch && swatch.dataset.accent) applyAccent(swatch.dataset.accent);
     });
 
+    document.getElementById('font-picker').addEventListener('change', function (e) {
+      applyFont(e.target.value);
+    });
+
     document.getElementById('settings-open-btn').addEventListener('click', function () {
       DueIt.renderClassManager(state.classes);
       document.getElementById('student-name').value = state.preferences.studentName || '';
       document.getElementById('student-grade').value = state.preferences.studentGrade || '';
       document.getElementById('share-email').value = state.preferences.shareEmail || '';
+      document.getElementById('font-picker').value = state.preferences.font || 'system';
       document.getElementById('settings-dialog').showModal();
     });
     document.getElementById('settings-close-btn').addEventListener('click', function () {
