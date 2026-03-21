@@ -290,7 +290,7 @@ DueIt.generateICS = function generateICS(assignments) {
   }
 
   function escapeICS(str) {
-    return (str || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+    return (str || '').replace(/;/g, '\\;').replace(/,/g, '\\,');
   }
 
   function nowStamp() {
@@ -322,7 +322,7 @@ DueIt.generateICS = function generateICS(assignments) {
     lines.push('DTSTART;VALUE=DATE:' + toICSDate(a.dueDate));
     lines.push('DTEND;VALUE=DATE:' + nextDay(a.dueDate));
     lines.push('SUMMARY:' + escapeICS(summary));
-    lines.push('DESCRIPTION:' + escapeICS('Due: ' + a.dueDate + '\\nClass: ' + a.className + '\\nType: ' + typeLabel));
+    lines.push('DESCRIPTION:' + escapeICS(a.className + ' ' + typeLabel));
     lines.push('STATUS:CONFIRMED');
     // Reminder alarm: 1 day before at 6pm
     lines.push('BEGIN:VALARM');
