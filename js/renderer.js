@@ -42,13 +42,15 @@ DueIt.renderTracker = function renderTracker(assignments, now, getClassColor) {
 
   container.innerHTML = sorted.map(function (a) {
     var cd = DueIt.computeCountdown(a.dueDate, now);
+    var isDone = a.isComplete || a.isStudied;
     var classes = ['assignment-card'];
-    if (cd.isOverdue) classes.push('overdue');
+    if (cd.isOverdue && !isDone) classes.push('overdue');
     if (cd.days === 0 && !cd.isOverdue) classes.push('due-today');
     if (cd.days === 1 && !cd.isOverdue) classes.push('due-tomorrow');
     if (a.isComplete) classes.push('completed');
 
-    var countdownClass = cd.isOverdue ? 'overdue-text' : (cd.days === 0 ? 'due-today-text' : '');
+    var countdownLabel = isDone ? 'Completed' : cd.label;
+    var countdownClass = (cd.isOverdue && !isDone) ? 'overdue-text' : (cd.days === 0 && !isDone ? 'due-today-text' : '');
     var dotColor = getClassColor ? getClassColor(a.className) : '#4a6cf7';
     var typeIcons = { homework: '📝', test: '📋', reading: '📖', project: '🎨' };
     var typeIcon = typeIcons[a.type || 'homework'] || '📝';
@@ -85,7 +87,7 @@ DueIt.renderTracker = function renderTracker(assignments, now, getClassColor) {
         metaLabel + ' · ' + _formatDate(a.dueDate) +
       '</div>' +
       '<div class="assignment-countdown ' + countdownClass + '">' +
-        cd.label +
+        countdownLabel +
       '</div>' +
       '<div class="assignment-actions">' +
         actionButtons +
