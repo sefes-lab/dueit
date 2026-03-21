@@ -201,7 +201,10 @@
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').catch(function () {});
+      navigator.serviceWorker.register('./sw.js?v=0.55').then(function (reg) {
+        // Force check for updated SW on every page load
+        reg.update();
+      }).catch(function () {});
     }
   </script>
 </body>
