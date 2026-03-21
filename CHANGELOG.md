@@ -2,7 +2,7 @@
 
 ## v0.56 — 2026-03-20
 
-- Calendar sync: � button in header exports all pending assignments as a single `.ics` file
+- Calendar sync: 🔄 button in header exports all pending assignments as a single `.ics` file
 - Each event includes assignment title, class, type, and two reminder alarms (1 day before + morning of)
 - Unique UIDs per assignment prevent duplicates when re-syncing
 - Uses Web Share API on mobile (opens Calendar app directly) or file download on desktop
