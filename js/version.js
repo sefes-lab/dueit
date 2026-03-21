@@ -1,9 +1,15 @@
 var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {};
 (typeof globalThis !== 'undefined' ? globalThis : window).DueIt = DueIt;
 
-DueIt.APP_VERSION = '0.55';
+DueIt.APP_VERSION = '0.56';
 
 DueIt.VERSION_HISTORY = [
+  {
+    version: '0.56',
+    date: '2026-03-20',
+    description:
+      'Calendar sync: export all pending assignments as a single .ics file with reminder alarms (1 day before + morning of); uses Web Share API on mobile or direct download on desktop; unique UIDs prevent duplicates on re-sync',
+  },
   {
     version: '0.55',
     date: '2026-03-20',

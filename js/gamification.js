@@ -262,3 +262,83 @@ DueIt.buildProgressReport = function buildProgressReport(assignments, preference
   lines.push('— Sent from DueIt v' + DueIt.APP_VERSION);
   return lines.join('\n');
 };
+
+
+/* ===== Calendar Sync (.ics export) ===== */
+
+DueIt.generateICS = function generateICS(assignments) {
+  var typeLabels = { homework: 'Homework', test: 'Test/Quiz', reading: 'Reading', project: 'Project' };
+
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+  function toICSDate(dateStr) {
+    // Due dates are date-only, so create an all-day event
+    var d = new Date(dateStr);
+    var y = d.getFullYear();
+    var m = pad(d.getMonth() + 1);
+    var day = pad(d.getDate());
+    return y + '' + m + '' + day;
+  }
+
+  function nextDay(dateStr) {
+    var d = new Date(dateStr);
+    d.setDate(d.getDate() + 1);
+    var y = d.getFullYear();
+    var m = pad(d.getMonth() + 1);
+    var day = pad(d.getDate());
+    return y + '' + m + '' + day;
+  }
+
+  function escapeICS(str) {
+    return (str || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+  }
+
+  function nowStamp() {
+    var d = new Date();
+    return d.getFullYear() + '' + pad(d.getMonth() + 1) + '' + pad(d.getDate()) + 'T' +
+           pad(d.getHours()) + '' + pad(d.getMinutes()) + '' + pad(d.getSeconds());
+  }
+
+  var lines = [];
+  lines.push('BEGIN:VCALENDAR');
+  lines.push('VERSION:2.0');
+  lines.push('PRODID:-//DueIt//Homework Planner//EN');
+  lines.push('CALSCALE:GREGORIAN');
+  lines.push('METHOD:PUBLISH');
+  lines.push('X-WR-CALNAME:DueIt Assignments');
+
+  var pending = assignments.filter(function (a) {
+    return !a.isComplete && !a.isStudied;
+  });
+
+  pending.forEach(function (a) {
+    var typeLabel = typeLabels[a.type || 'homework'] || 'Homework';
+    var summary = a.title + ' (' + a.className + ' ' + typeLabel + ')';
+    var stamp = nowStamp();
+
+    lines.push('BEGIN:VEVENT');
+    lines.push('UID:dueit-' + a.id + '@dueit.app');
+    lines.push('DTSTAMP:' + stamp);
+    lines.push('DTSTART;VALUE=DATE:' + toICSDate(a.dueDate));
+    lines.push('DTEND;VALUE=DATE:' + nextDay(a.dueDate));
+    lines.push('SUMMARY:' + escapeICS(summary));
+    lines.push('DESCRIPTION:' + escapeICS('Due: ' + a.dueDate + '\\nClass: ' + a.className + '\\nType: ' + typeLabel));
+    lines.push('STATUS:CONFIRMED');
+    // Reminder alarm: 1 day before at 6pm
+    lines.push('BEGIN:VALARM');
+    lines.push('TRIGGER:-P1D');
+    lines.push('ACTION:DISPLAY');
+    lines.push('DESCRIPTION:' + escapeICS(a.title + ' is due tomorrow!'));
+    lines.push('END:VALARM');
+    // Second alarm: morning of due date
+    lines.push('BEGIN:VALARM');
+    lines.push('TRIGGER:-PT3H');
+    lines.push('ACTION:DISPLAY');
+    lines.push('DESCRIPTION:' + escapeICS(a.title + ' is due today!'));
+    lines.push('END:VALARM');
+    lines.push('END:VEVENT');
+  });
+
+  lines.push('END:VCALENDAR');
+  return { content: lines.join('\r\n'), count: pending.length };
+};

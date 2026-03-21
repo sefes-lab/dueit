@@ -444,6 +444,39 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     win.focus();
     win.print();
   }
+  function handleCalendarSync() {
+      var result = DueIt.generateICS(state.assignments);
+      if (result.count === 0) {
+        alert('No pending assignments to sync!');
+        return;
+      }
+      var blob = new Blob([result.content], { type: 'text/calendar;charset=utf-8' });
+      var file = new File([blob], 'dueit-assignments.ics', { type: 'text/calendar' });
+
+      // Try Web Share API with file (mobile)
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({
+          title: 'DueIt Assignments',
+          files: [file],
+        }).catch(function () {
+          // User cancelled or share failed — fall back to download
+          downloadICS(blob);
+        });
+      } else {
+        downloadICS(blob);
+      }
+    }
+
+    function downloadICS(blob) {
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'dueit-assignments.ics';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    }
 
   function handleShare() {
     var streak = computeStreak(state.assignments);
@@ -610,6 +643,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     document.getElementById('class-list').addEventListener('click', handleClassListClick);
     document.getElementById('save-profile-btn').addEventListener('click', handleSaveProfile);
     document.getElementById('print-btn').addEventListener('click', handlePrint);
+    document.getElementById('calendar-sync-btn').addEventListener('click', handleCalendarSync);
     document.getElementById('share-btn').addEventListener('click', handleShare);
     document.getElementById('share-email-btn').addEventListener('click', handleShareEmail);
     document.getElementById('share-copy-btn').addEventListener('click', handleShareCopy);
