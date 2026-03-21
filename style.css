@@ -236,9 +236,10 @@
 /* ===== Color Picker Swatches ===== */
 .color-picker { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 #font-picker {
-  font-size: 0.8rem; padding: 0.2rem 0.4rem; border-radius: var(--radius);
+  font-size: 0.75rem; padding: 0.15rem 0.3rem; border-radius: var(--radius);
   border: 1px solid var(--clr-border); background: var(--clr-input-bg);
   color: var(--clr-text); cursor: pointer; font-family: var(--font-family);
+  max-width: 7rem;
 }
 .color-swatch {
   width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent;
