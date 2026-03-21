@@ -1,5 +1,31 @@
 # DueIt — Version History
 
+## v0.52 — 2026-03-20
+
+- Native Web Share API support on mobile (📱 Share button opens system share sheet on iOS/Android)
+- mailto body truncation to prevent long reports from being cut off on mobile browsers
+- Touch-friendly scrolling in share dialog preview
+- Responsive share button layout for narrow screens
+
+## v0.51 — 2026-03-20
+
+- Share Progress button (📤) in header opens a progress report dialog
+- Progress report includes XP, level, streak, overall stats, weekly stats, unlocked badges, and upcoming assignments
+- Send report via email (opens mail client with pre-filled subject and body)
+- Copy report to clipboard for pasting into any messaging app
+- "Share Progress To" email field in Settings > Student Profile, saved to preferences
+- Share dialog pre-fills recipient from saved preference; also saves new addresses on send
+
+## v0.5 — 2026-03-20
+
+- XP & leveling system: earn XP for completing (10), turning in (20), studying (15), and on-time submissions (10 bonus)
+- 10 student levels from "Freshman" to "Legend" with progress bar in tracker sidebar
+- Level-up toast notification with confetti burst on level advancement
+- 10 unlockable achievement badges (First Seed, High Five, Punctual, Perfect Week, etc.)
+- Badges viewable in Settings with locked/unlocked visual states
+- Weekly progress stats panel showing completion count, turn-ins, and weekly percentage
+- Streak bonus XP (5 per day beyond first)
+
 ## v0.4 — 2026-03-16
 
 - Calendar view toggle (📅/📋) in Assignment Tracker

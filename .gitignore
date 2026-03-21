@@ -3,6 +3,9 @@
 
 node_modules
 
+# Kiro specs
+.kiro/
+
 # Editor directories and files
 .vscode/*
 !.vscode/settings.json

@@ -1,9 +1,27 @@
 var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {};
 (typeof globalThis !== 'undefined' ? globalThis : window).DueIt = DueIt;
 
-DueIt.APP_VERSION = '0.4';
+DueIt.APP_VERSION = '0.52';
 
 DueIt.VERSION_HISTORY = [
+  {
+    version: '0.52',
+    date: '2026-03-20',
+    description:
+      'Mobile share improvements: native Web Share API support (📱 Share button on iOS/Android), mailto body truncation for long reports, touch-friendly scrolling in share dialog, responsive button layout',
+  },
+  {
+    version: '0.51',
+    date: '2026-03-20',
+    description:
+      'Share Progress: email progress reports with XP, level, badges, weekly stats, and upcoming assignments; configurable recipient email in Settings; copy-to-clipboard option',
+  },
+  {
+    version: '0.5',
+    date: '2026-03-20',
+    description:
+      'Gamification: XP & leveling system (earn XP for completing/turning in assignments, on-time bonuses), 10 unlockable achievement badges, weekly progress stats panel, level-up toast with confetti',
+  },
   {
     version: '0.4',
     date: '2026-03-16',

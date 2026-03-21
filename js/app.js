@@ -16,6 +16,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
   var storageAvailable = true;
   var confirmResolve = null;
   var calendarMode = false;
+  var lastLevel = 0;
 
   function loadState() {
     try {
@@ -44,6 +45,8 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     if (needsPersist) {
       persist();
     }
+    // Initialize level tracking so page load doesn't trigger level-up toast
+    lastLevel = DueIt.computeLevel(DueIt.computeXP(state.assignments)).level;
   }
 
   function persist() {
@@ -58,6 +61,9 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     DueIt.renderClassDropdown(state.classes);
     DueIt.renderClassManager(state.classes);
     renderStreak();
+    renderXPBar();
+    renderWeeklyStats();
+    renderBadges();
     updateTitle();
     updateCalendarVisibility();
   }
@@ -159,6 +165,88 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     } else {
       el.innerHTML = '';
     }
+  }
+
+  function renderXPBar() {
+    var el = document.getElementById('xp-bar-container');
+    if (!el) return;
+    var xp = DueIt.computeXP(state.assignments);
+    var info = DueIt.computeLevel(xp);
+
+    // Detect level-up
+    if (lastLevel > 0 && info.level > lastLevel) {
+      showLevelUpToast(info.level, info.title);
+      setTimeout(function () {
+        var wrapper = el.querySelector('.xp-bar-wrapper');
+        if (wrapper) wrapper.classList.add('level-up');
+        setTimeout(function () {
+          if (wrapper) wrapper.classList.remove('level-up');
+        }, 1200);
+      }, 50);
+    }
+    lastLevel = info.level;
+
+    var pct = Math.round(info.progress * 100);
+    var xpLabel = info.isMaxLevel
+      ? info.xp + ' XP (MAX)'
+      : info.xp + ' / ' + info.xpForNext + ' XP';
+
+    el.innerHTML =
+      '<div class="xp-bar-wrapper">' +
+        '<div class="xp-header">' +
+          '<span class="xp-level">Lv. ' + info.level + ' <span class="xp-title">' + _esc(info.title) + '</span></span>' +
+          '<span class="xp-count">' + xpLabel + '</span>' +
+        '</div>' +
+        '<div class="xp-track"><div class="xp-fill" style="width:' + pct + '%"></div></div>' +
+      '</div>';
+  }
+
+  function renderWeeklyStats() {
+    var el = document.getElementById('weekly-stats-container');
+    if (!el) return;
+    var stats = DueIt.computeWeeklyStats(state.assignments);
+    if (stats.total === 0) { el.innerHTML = ''; return; }
+    el.innerHTML =
+      '<div class="weekly-stats">' +
+        '<div class="weekly-stat">' +
+          '<span class="weekly-stat-value">' + stats.completed + '/' + stats.total + '</span>' +
+          '<span class="weekly-stat-label">Done</span>' +
+        '</div>' +
+        '<div class="weekly-stat">' +
+          '<span class="weekly-stat-value">' + stats.turnedIn + '</span>' +
+          '<span class="weekly-stat-label">Turned In</span>' +
+        '</div>' +
+        '<div class="weekly-stat">' +
+          '<span class="weekly-stat-value">' + stats.completionRate + '%</span>' +
+          '<span class="weekly-stat-label">This Week</span>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function renderBadges() {
+    var el = document.getElementById('badges-grid');
+    if (!el) return;
+    var badges = DueIt.computeBadges(state.assignments);
+    el.innerHTML = badges.map(function (b) {
+      var cls = b.unlocked ? 'badge-card unlocked' : 'badge-card locked';
+      return '<div class="' + cls + '" title="' + _esc(b.desc) + '">' +
+        '<span class="badge-emoji">' + b.emoji + '</span>' +
+        '<span class="badge-name">' + _esc(b.name) + '</span>' +
+        '<span class="badge-desc">' + _esc(b.desc) + '</span>' +
+      '</div>';
+    }).join('');
+  }
+
+  function showLevelUpToast(level, title) {
+    var toast = document.createElement('div');
+    toast.className = 'level-up-toast';
+    toast.textContent = '⬆️ Level ' + level + ' — ' + title + '!';
+    document.body.appendChild(toast);
+    spawnConfetti();
+    setTimeout(function () {
+      toast.classList.add('hiding');
+      setTimeout(function () { toast.remove(); }, 500);
+    }, 2500);
   }
 
   function spawnConfetti() {
@@ -291,6 +379,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
   function handleSaveProfile() {
     state.preferences.studentName = document.getElementById('student-name').value.trim();
     state.preferences.studentGrade = document.getElementById('student-grade').value.trim();
+    state.preferences.shareEmail = document.getElementById('share-email').value.trim();
     persist();
     renderAll();
   }
@@ -368,6 +457,124 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     win.print();
   }
 
+  function handleShare() {
+    var streak = computeStreak(state.assignments);
+    var report = DueIt.buildProgressReport(state.assignments, state.preferences, streak);
+    var emailInput = document.getElementById('share-dialog-email');
+    var preview = document.getElementById('share-preview');
+    var feedback = document.getElementById('share-feedback');
+    var nativeShareBtn = document.getElementById('share-native-btn');
+
+    // Pre-fill email from preferences
+    emailInput.value = state.preferences.shareEmail || '';
+    preview.textContent = report;
+    feedback.textContent = '';
+
+    // Show/hide native share button based on Web Share API support
+    if (navigator.share) {
+      nativeShareBtn.hidden = false;
+    } else {
+      nativeShareBtn.hidden = true;
+    }
+
+    document.getElementById('share-dialog').showModal();
+  }
+
+  function handleShareEmail() {
+    var email = document.getElementById('share-dialog-email').value.trim();
+    var feedback = document.getElementById('share-feedback');
+    if (!email) {
+      feedback.textContent = 'Please enter an email address.';
+      feedback.style.color = 'var(--clr-danger)';
+      return;
+    }
+    // Save the email to preferences for next time
+    state.preferences.shareEmail = email;
+    persist();
+    var settingsEmail = document.getElementById('share-email');
+    if (settingsEmail) settingsEmail.value = email;
+
+    var streak = computeStreak(state.assignments);
+    var report = DueIt.buildProgressReport(state.assignments, state.preferences, streak);
+    var name = (state.preferences.studentName || '').trim();
+    var first = name.split(' ')[0] || 'Student';
+    var subject = encodeURIComponent(first + "'s DueIt Progress Report");
+    var body = encodeURIComponent(report);
+
+    // mailto URLs can be truncated on mobile (~2000 char limit).
+    // If the full URL is too long, trim the body and append a note.
+    var mailto = 'mailto:' + encodeURIComponent(email) + '?subject=' + subject + '&body=' + body;
+    if (mailto.length > 1900) {
+      // Build a shorter version: just the summary section
+      var shortReport = DueIt.buildProgressReport(state.assignments, state.preferences, streak);
+      // Truncate to fit within limits
+      var maxBodyLen = 1500;
+      if (shortReport.length > maxBodyLen) {
+        shortReport = shortReport.substring(0, maxBodyLen) + '\n\n[Report trimmed — use Copy or Share for full version]';
+      }
+      body = encodeURIComponent(shortReport);
+      mailto = 'mailto:' + encodeURIComponent(email) + '?subject=' + subject + '&body=' + body;
+    }
+
+    window.location.href = mailto;
+    feedback.textContent = 'Opening email client...';
+    feedback.style.color = 'var(--clr-complete)';
+  }
+
+  function handleShareNative() {
+    var report = document.getElementById('share-preview').textContent;
+    var name = (state.preferences.studentName || '').trim();
+    var first = name.split(' ')[0] || 'Student';
+    var feedback = document.getElementById('share-feedback');
+
+    navigator.share({
+      title: first + "'s DueIt Progress Report",
+      text: report,
+    }).then(function () {
+      feedback.textContent = '✓ Shared!';
+      feedback.style.color = 'var(--clr-complete)';
+    }).catch(function (err) {
+      // User cancelled — not an error
+      if (err.name !== 'AbortError') {
+        feedback.textContent = 'Could not share. Try Copy instead.';
+        feedback.style.color = 'var(--clr-danger)';
+      }
+    });
+  }
+
+  function handleShareCopy() {
+    var report = document.getElementById('share-preview').textContent;
+    var feedback = document.getElementById('share-feedback');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(report).then(function () {
+        feedback.textContent = '✓ Copied to clipboard!';
+        feedback.style.color = 'var(--clr-complete)';
+      }).catch(function () {
+        fallbackCopy(report, feedback);
+      });
+    } else {
+      fallbackCopy(report, feedback);
+    }
+  }
+
+  function fallbackCopy(text, feedback) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand('copy');
+      feedback.textContent = '✓ Copied to clipboard!';
+      feedback.style.color = 'var(--clr-complete)';
+    } catch (e) {
+      feedback.textContent = 'Could not copy. Please select and copy manually.';
+      feedback.style.color = 'var(--clr-danger)';
+    }
+    document.body.removeChild(ta);
+  }
+
   function handleExport() {
     DueIt.triggerExportDownload({
       assignments: state.assignments,
@@ -415,6 +622,13 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     document.getElementById('class-list').addEventListener('click', handleClassListClick);
     document.getElementById('save-profile-btn').addEventListener('click', handleSaveProfile);
     document.getElementById('print-btn').addEventListener('click', handlePrint);
+    document.getElementById('share-btn').addEventListener('click', handleShare);
+    document.getElementById('share-email-btn').addEventListener('click', handleShareEmail);
+    document.getElementById('share-copy-btn').addEventListener('click', handleShareCopy);
+    document.getElementById('share-native-btn').addEventListener('click', handleShareNative);
+    document.getElementById('share-close-btn').addEventListener('click', function () {
+      document.getElementById('share-dialog').close();
+    });
     document.getElementById('export-btn').addEventListener('click', handleExport);
     document.getElementById('import-file').addEventListener('change', handleImport);
     document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
@@ -434,6 +648,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
       DueIt.renderClassManager(state.classes);
       document.getElementById('student-name').value = state.preferences.studentName || '';
       document.getElementById('student-grade').value = state.preferences.studentGrade || '';
+      document.getElementById('share-email').value = state.preferences.shareEmail || '';
       document.getElementById('settings-dialog').showModal();
     });
     document.getElementById('settings-close-btn').addEventListener('click', function () {

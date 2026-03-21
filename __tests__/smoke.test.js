@@ -12,8 +12,8 @@ import '../js/import-export.js';
 const D = globalThis.DueIt;
 
 describe('version', () => {
-  it('exports APP_VERSION as 0.4', () => {
-    expect(D.APP_VERSION).toBe('0.4');
+  it('exports APP_VERSION as 0.52', () => {
+    expect(D.APP_VERSION).toBe('0.52');
   });
 
   it('has at least one version history entry', () => {

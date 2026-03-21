@@ -1,4 +1,4 @@
-var CACHE_NAME = 'dueit-v0.4';
+var CACHE_NAME = 'dueit-v0.52';
 var ASSETS = [
   './',
   './index.html',
@@ -12,6 +12,7 @@ var ASSETS = [
   './js/classes.js',
   './js/import-export.js',
   './js/calendar.js',
+  './js/gamification.js',
   './js/renderer.js',
   './js/app.js',
   './icons/icon.svg',
