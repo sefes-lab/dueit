@@ -10,7 +10,7 @@ DueIt is a homework planner PWA for a middle school student (April Shterling, Gr
 - GitHub Pages: `https://sefes-lab.github.io/dueit/`
 - License: All Rights Reserved (proprietary)
 
-## Current Version: 0.4
+## Current Version: 0.54
 
 ## Tech Stack
 - Plain HTML5 + CSS + JS (no build step, no framework)
@@ -47,22 +47,26 @@ package.json        — Dev dependencies only (vitest, fast-check)
 .gitignore          — Excludes node_modules, .kiro/, .vscode/*, .DS_Store
 ```
 
-## Key Features (v0.4)
+## Key Features (v0.54)
 - Assignment CRUD with class, type (Homework/Test/Quiz/Reading/Project), due date
 - Progress tracking: Done (👍), Turn In (🫴), Studied (📖 for tests)
 - Turn In requires Done first; undoing Done clears Turn In
 - Due date countdown by days (local timezone)
 - Calendar view toggle (📅/📋) — monthly grid with colored dots, test highlighting, tooltips
-- 6 accent color schemes with light/dark variants (darker follows dark mode, lighter follows light mode)
+- 6 full-theme color schemes that tint backgrounds, surfaces, borders, inputs, and shadows (light/dark variants)
 - Confetti on turn-in, streak counter
 - Class color dots, urgency glow for due-soon items
-- Student profile (name, grade) in Settings modal (⚙️)
+- XP & leveling system (10 levels, Freshman→Legend), 10 unlockable achievement badges, weekly progress stats
+- Share Progress (📤) — email or copy progress reports with XP, level, badges, stats, upcoming assignments
+- Native Web Share API on mobile (📱 Share button)
+- Student profile (name, grade, share-to email) in Settings modal (⚙️)
 - Default classes: Spanish, Language Arts, US History, Choir, Math, Science
 - Personalized header: "April's DueIt"
 - Dark/light mode toggle (🌙/☀️)
 - Print view (🖨️) with done/turned-in dates
 - JSON export/import for data portability
 - PWA: installable, works offline
+- Service worker uses network-first caching for instant updates
 
 ## User Preferences & Rules
 - App is for a middle school student — simplicity and portability are priorities
