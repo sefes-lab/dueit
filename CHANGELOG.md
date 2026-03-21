@@ -1,5 +1,11 @@
 # DueIt — Version History
 
+## v0.54 — 2026-03-20
+
+- Fix: service worker now uses network-first caching strategy
+- CSS and JS updates apply immediately on reload instead of requiring a second visit
+- Offline fallback still works — cached assets served when network is unavailable
+
 ## v0.53 — 2026-03-20
 
 - Color schemes now tint the entire UI, not just buttons and header

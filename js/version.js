@@ -1,9 +1,15 @@
 var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {};
 (typeof globalThis !== 'undefined' ? globalThis : window).DueIt = DueIt;
 
-DueIt.APP_VERSION = '0.53';
+DueIt.APP_VERSION = '0.54';
 
 DueIt.VERSION_HISTORY = [
+  {
+    version: '0.54',
+    date: '2026-03-20',
+    description:
+      'Fix: switched service worker to network-first caching so CSS and JS updates apply immediately without needing a second reload',
+  },
   {
     version: '0.53',
     date: '2026-03-20',

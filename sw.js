@@ -1,4 +1,4 @@
-var CACHE_NAME = 'dueit-v0.53';
+var CACHE_NAME = 'dueit-v0.54';
 var ASSETS = [
   './',
   './index.html',
@@ -42,8 +42,18 @@ self.addEventListener('activate', function (e) {
 
 self.addEventListener('fetch', function (e) {
   e.respondWith(
-    caches.match(e.request).then(function (cached) {
-      return cached || fetch(e.request);
+    fetch(e.request).then(function (response) {
+      // Update cache with fresh response
+      if (response.ok) {
+        var clone = response.clone();
+        caches.open(CACHE_NAME).then(function (cache) {
+          cache.put(e.request, clone);
+        });
+      }
+      return response;
+    }).catch(function () {
+      // Offline fallback to cache
+      return caches.match(e.request);
     })
   );
 });
