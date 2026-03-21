@@ -508,6 +508,25 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
       document.body.removeChild(a);
       setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
     }
+    function buildExportFile() {
+        var json = DueIt.serializePlannerData({
+          assignments: state.assignments,
+          classes: state.classes,
+          preferences: state.preferences,
+        });
+        return new File([json], 'dueit-data.json', { type: 'application/json' });
+      }
+
+      function downloadFile(file) {
+        var url = URL.createObjectURL(file);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = file.name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      }
 
   function handleShare() {
     var streak = computeStreak(state.assignments);
@@ -571,6 +590,13 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     window.location.href = mailto;
     feedback.textContent = 'Opening email client...';
     feedback.style.color = 'var(--clr-complete)';
+
+    // Download JSON data file if attach checkbox is checked
+    if (document.getElementById('share-attach-data').checked) {
+      var file = buildExportFile();
+      downloadFile(file);
+      feedback.textContent = 'Opening email client... JSON data downloaded — attach it to the email.';
+    }
   }
 
   function handleShareNative() {
@@ -579,10 +605,20 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     var first = name.split(' ')[0] || 'Student';
     var feedback = document.getElementById('share-feedback');
 
-    navigator.share({
+    var shareData = {
       title: first + "'s DueIt Progress Report",
       text: report,
-    }).then(function () {
+    };
+
+    // Include JSON data file if attach checkbox is checked
+    if (document.getElementById('share-attach-data').checked) {
+      var file = buildExportFile();
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        shareData.files = [file];
+      }
+    }
+
+    navigator.share(shareData).then(function () {
       feedback.textContent = '✓ Shared!';
       feedback.style.color = 'var(--clr-complete)';
     }).catch(function (err) {

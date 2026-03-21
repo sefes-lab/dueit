@@ -1,5 +1,12 @@
 # DueIt — Version History
 
+## v0.58 — 2026-03-21
+
+- "📎 Attach data" checkbox in Share Progress dialog
+- When checked, mobile share (📱) includes the JSON data file via Web Share API
+- When checked, email share (📧) downloads the JSON file alongside opening the email client, with a note to attach it
+- Parent can import the attached JSON into their own DueIt to see full assignment data
+
 ## v0.57 — 2026-03-20
 
 - Font picker in Settings header: choose from 6 fonts

@@ -492,6 +492,10 @@ dialog:not(.settings-dialog)::backdrop { background: rgba(0,0,0,0.4); }
   margin-bottom: 0.75rem;
   -webkit-overflow-scrolling: touch;
 }
+.share-attach-label {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.85rem; margin-bottom: 0.5rem; cursor: pointer;
+}
 .share-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 .share-actions .btn { flex: 1; min-width: 0; }
 .share-feedback {

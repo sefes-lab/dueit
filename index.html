@@ -180,6 +180,9 @@
         <input type="email" id="share-dialog-email" placeholder="recipient@email.com" />
       </div>
       <pre class="share-preview" id="share-preview"></pre>
+      <label class="share-attach-label">
+        <input type="checkbox" id="share-attach-data" /> 📎 Attach data (for import)
+      </label>
       <div class="share-actions">
         <button type="button" class="btn btn-primary" id="share-native-btn" hidden>📱 Share</button>
         <button type="button" class="btn btn-primary" id="share-email-btn">📧 Send Email</button>
@@ -211,7 +214,7 @@
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js?v=0.57').then(function (reg) {
+      navigator.serviceWorker.register('./sw.js?v=0.58').then(function (reg) {
         // Force check for updated SW on every page load
         reg.update();
       }).catch(function () {});

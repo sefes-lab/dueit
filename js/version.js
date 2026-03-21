@@ -1,9 +1,15 @@
 var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {};
 (typeof globalThis !== 'undefined' ? globalThis : window).DueIt = DueIt;
 
-DueIt.APP_VERSION = '0.57';
+DueIt.APP_VERSION = '0.58';
 
 DueIt.VERSION_HISTORY = [
+  {
+    version: '0.58',
+    date: '2026-03-21',
+    description:
+      'Attach Data option in Share dialog: checkbox to include JSON export with progress report; mobile share includes file via Web Share API; email share downloads JSON for manual attachment',
+  },
   {
     version: '0.57',
     date: '2026-03-20',
