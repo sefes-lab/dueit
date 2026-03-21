@@ -1,4 +1,4 @@
-var CACHE_NAME = 'dueit-v0.54';
+var CACHE_NAME = 'dueit-v0.55';
 var ASSETS = [
   './',
   './index.html',

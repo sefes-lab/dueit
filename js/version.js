@@ -1,9 +1,15 @@
 var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {};
 (typeof globalThis !== 'undefined' ? globalThis : window).DueIt = DueIt;
 
-DueIt.APP_VERSION = '0.54';
+DueIt.APP_VERSION = '0.55';
 
 DueIt.VERSION_HISTORY = [
+  {
+    version: '0.55',
+    date: '2026-03-20',
+    description:
+      'Unified share and print reports: both now show gamification summary (level, XP, streak, badges) plus the complete assignment list with status, due dates, and completion dates',
+  },
   {
     version: '0.54',
     date: '2026-03-20',

@@ -385,64 +385,52 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
   }
 
   function buildPrintableHtml() {
-    var name = (state.preferences.studentName || '').trim();
-    var grade = (state.preferences.studentGrade || '').trim();
-    var first = name.split(' ')[0];
-    var heading = first ? first + "'s Assignments" : 'My Assignments';
-    var subtitle = name && grade ? name + ' — Grade ' + grade : (name || '');
-    var now = new Date();
-    var sorted = DueIt.sortByDueDate(state.assignments);
+      var streak = computeStreak(state.assignments);
+      var d = DueIt.buildReportData(state.assignments, state.preferences, streak);
+      var heading = d.first ? d.first + "'s Assignments" : 'My Assignments';
+      var subtitle = d.name && d.grade ? d.name + ' — Grade ' + d.grade : (d.name || '');
 
-    var rows = sorted.map(function (a) {
-      var cd = DueIt.computeCountdown(a.dueDate, now);
-      var typeIcons = { homework: '📝', test: '📋', reading: '📖', project: '🎨' };
-      var typeLabel = typeIcons[a.type || 'homework'] || '📝';
-      var isTest = (a.type === 'test');
-      var status;
-      if (isTest) {
-        status = a.isStudied ? 'Studied' : 'Not Studied';
-      } else {
-        status = a.isTurnedIn ? 'Turned In' : (a.isComplete ? 'Done' : 'Pending');
-      }
-      var due = new Date(a.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-      var doneDate = '';
-      if (isTest && a.studiedAt) {
-        doneDate = new Date(a.studiedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-      } else if (!isTest && a.completedAt) {
-        doneDate = new Date(a.completedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-      }
-      var turnedInDate = a.turnedInAt ? new Date(a.turnedInAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '';
-      return '<tr>' +
-        '<td>' + typeLabel + '</td>' +
-        '<td>' + _esc(a.className) + '</td>' +
-        '<td>' + _esc(a.title) + '</td>' +
-        '<td>' + due + '</td>' +
-        '<td>' + cd.label + '</td>' +
-        '<td>' + status + '</td>' +
-        '<td>' + doneDate + '</td>' +
-        '<td>' + (isTest ? '' : turnedInDate) + '</td>' +
-      '</tr>';
-    }).join('\n');
+      var summaryHtml = '<div class="summary">' +
+        '<span>⭐ Level ' + d.level.level + ' — ' + _esc(d.level.title) + ' (' + d.xp + ' XP)</span>' +
+        (d.streak >= 2 ? ' &nbsp;|&nbsp; <span>🔥 ' + d.streak + '-day streak</span>' : '') +
+        ' &nbsp;|&nbsp; <span>📈 ' + d.completed + '/' + d.total + ' completed, ' + d.turnedIn + ' turned in</span>' +
+        (d.unlocked.length > 0 ? ' &nbsp;|&nbsp; <span>🏆 ' + d.unlocked.map(function (b) { return b.emoji; }).join('') + '</span>' : '') +
+        '</div>';
 
-    return '<!DOCTYPE html>\n<html lang="en"><head><meta charset="UTF-8"/>' +
-      '<title>' + _esc(heading) + '</title>' +
-      '<style>' +
-        'body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;margin:2rem;color:#2d3436}' +
-        'h1{font-size:1.4rem;margin-bottom:0.25rem}' +
-        '.subtitle{color:#636e72;margin-bottom:0.5rem;font-size:0.9rem}' +
-        '.date{color:#636e72;font-size:0.8rem;margin-bottom:1rem}' +
-        'table{width:100%;border-collapse:collapse;font-size:0.9rem}' +
-        'th,td{text-align:left;padding:0.4rem 0.6rem;border-bottom:1px solid #dfe6e9}' +
-        'th{background:#f4f6f8;font-weight:600}' +
-        'tr.overdue td:nth-child(4){color:#e74c3c;font-weight:600}' +
-      '</style></head><body>' +
-      '<h1>' + _esc(heading) + '</h1>' +
-      (subtitle ? '<p class="subtitle">' + _esc(subtitle) + '</p>' : '') +
-      '<p class="date">Printed ' + now.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) + '</p>' +
-      '<table><thead><tr><th>Type</th><th>Class</th><th>Assignment</th><th>Due Date</th><th>Countdown</th><th>Status</th><th>Done</th><th>Turned In</th></tr></thead>' +
-      '<tbody>' + (rows || '<tr><td colspan="8" style="text-align:center;padding:1rem">No assignments</td></tr>') + '</tbody></table>' +
-      '</body></html>';
-  }
+      var rows = d.rows.map(function (r) {
+        return '<tr>' +
+          '<td>' + r.icon + '</td>' +
+          '<td>' + _esc(r.className) + '</td>' +
+          '<td>' + _esc(r.title) + '</td>' +
+          '<td>' + r.dueDate + '</td>' +
+          '<td>' + r.countdown + '</td>' +
+          '<td>' + r.status + '</td>' +
+          '<td>' + r.doneDate + '</td>' +
+          '<td>' + (r.isTest ? '' : r.turnedInDate) + '</td>' +
+        '</tr>';
+      }).join('\n');
+
+      return '<!DOCTYPE html>\n<html lang="en"><head><meta charset="UTF-8"/>' +
+        '<title>' + _esc(heading) + '</title>' +
+        '<style>' +
+          'body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;margin:2rem;color:#2d3436}' +
+          'h1{font-size:1.4rem;margin-bottom:0.25rem}' +
+          '.subtitle{color:#636e72;margin-bottom:0.5rem;font-size:0.9rem}' +
+          '.date{color:#636e72;font-size:0.8rem;margin-bottom:0.5rem}' +
+          '.summary{font-size:0.85rem;margin-bottom:1rem;padding:0.5rem 0;border-bottom:1px solid #dfe6e9}' +
+          'table{width:100%;border-collapse:collapse;font-size:0.9rem}' +
+          'th,td{text-align:left;padding:0.4rem 0.6rem;border-bottom:1px solid #dfe6e9}' +
+          'th{background:#f4f6f8;font-weight:600}' +
+          'tr.overdue td:nth-child(4){color:#e74c3c;font-weight:600}' +
+        '</style></head><body>' +
+        '<h1>' + _esc(heading) + '</h1>' +
+        (subtitle ? '<p class="subtitle">' + _esc(subtitle) + '</p>' : '') +
+        '<p class="date">Printed ' + d.date.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) + '</p>' +
+        summaryHtml +
+        '<table><thead><tr><th>Type</th><th>Class</th><th>Assignment</th><th>Due Date</th><th>Countdown</th><th>Status</th><th>Done</th><th>Turned In</th></tr></thead>' +
+        '<tbody>' + (rows || '<tr><td colspan="8" style="text-align:center;padding:1rem">No assignments</td></tr>') + '</tbody></table>' +
+        '</body></html>';
+    }
 
   function _esc(s) {
     return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');

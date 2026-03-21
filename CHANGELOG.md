@@ -1,5 +1,12 @@
 # DueIt — Version History
 
+## v0.55 — 2026-03-20
+
+- Unified share and print reports to show the same information
+- Share report now includes the complete assignment list (all assignments, not just upcoming 5) with type, class, due date, countdown, status, and completion dates
+- Print view now includes gamification summary (level, XP, streak, badges) at the top
+- Both reports reflect identical data: gamification summary + full assignment table
+
 ## v0.54 — 2026-03-20
 
 - Fix: service worker now uses network-first caching strategy

@@ -148,94 +148,117 @@ DueIt.computeWeeklyStats = function computeWeeklyStats(assignments) {
 };
 
 
-/* ===== Progress Report (for sharing) ===== */
+/* ===== Shared Report Data (used by both text share and HTML print) ===== */
 
-DueIt.buildProgressReport = function buildProgressReport(assignments, preferences, streak) {
+DueIt.buildReportData = function buildReportData(assignments, preferences, streak) {
   var name = (preferences.studentName || '').trim();
   var grade = (preferences.studentGrade || '').trim();
   var first = name.split(' ')[0] || 'Student';
   var now = new Date();
-  var dateStr = now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  var typeIcons = { homework: '📝', test: '📋', reading: '📖', project: '🎨' };
 
-  // XP & Level
+  function fmtDate(iso) {
+    try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }); }
+    catch (e) { return iso || ''; }
+  }
+
   var xp = DueIt.computeXP(assignments);
   var lvl = DueIt.computeLevel(xp);
-
-  // Overall stats
   var total = assignments.length;
   var completed = assignments.filter(function (a) { return a.isComplete || a.isStudied; }).length;
   var turnedIn = assignments.filter(function (a) { return a.isTurnedIn; }).length;
-  var onTime = assignments.filter(function (a) {
-    if (!a.isTurnedIn || !a.turnedInAt || !a.dueDate) return false;
-    return new Date(a.turnedInAt) <= new Date(a.dueDate + 'T23:59:59');
-  }).length;
-
-  // Weekly stats
-  var weekly = DueIt.computeWeeklyStats(assignments);
-
-  // Badges
   var badges = DueIt.computeBadges(assignments);
   var unlocked = badges.filter(function (b) { return b.unlocked; });
+  var sorted = DueIt.sortByDueDate(assignments);
 
-  // Upcoming (not complete, sorted by due date)
-  var upcoming = DueIt.sortByDueDate(
-    assignments.filter(function (a) { return !a.isComplete && !a.isStudied; })
-  ).slice(0, 5);
+  var rows = sorted.map(function (a) {
+    var cd = DueIt.computeCountdown(a.dueDate, now);
+    var icon = typeIcons[a.type || 'homework'] || '📝';
+    var isTest = (a.type === 'test');
+    var status;
+    if (isTest) {
+      status = a.isStudied ? 'Studied' : 'Not Studied';
+    } else {
+      status = a.isTurnedIn ? 'Turned In' : (a.isComplete ? 'Done' : 'Pending');
+    }
+    var doneDate = '';
+    if (isTest && a.studiedAt) {
+      doneDate = fmtDate(a.studiedAt);
+    } else if (!isTest && a.completedAt) {
+      doneDate = fmtDate(a.completedAt);
+    }
+    var turnedInDate = (!isTest && a.turnedInAt) ? fmtDate(a.turnedInAt) : '';
+    return {
+      icon: icon,
+      className: a.className,
+      title: a.title,
+      dueDate: fmtDate(a.dueDate),
+      countdown: cd.label,
+      status: status,
+      doneDate: doneDate,
+      turnedInDate: turnedInDate,
+      isTest: isTest,
+    };
+  });
 
-  // Build the report
+  return {
+    name: name,
+    first: first,
+    grade: grade,
+    date: now,
+    xp: xp,
+    level: lvl,
+    streak: streak,
+    total: total,
+    completed: completed,
+    turnedIn: turnedIn,
+    unlocked: unlocked,
+    badgeCount: badges.length,
+    rows: rows,
+  };
+};
+
+
+/* ===== Text Progress Report (for sharing) ===== */
+
+DueIt.buildProgressReport = function buildProgressReport(assignments, preferences, streak) {
+  var d = DueIt.buildReportData(assignments, preferences, streak);
+  var dateStr = d.date.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
   var lines = [];
   lines.push('📊 DueIt Progress Report');
   lines.push('━━━━━━━━━━━━━━━━━━━━━━━━');
   lines.push('');
-  lines.push(first + (grade ? ' (Grade ' + grade + ')' : '') + ' — ' + dateStr);
+  lines.push(d.first + (d.grade ? ' (Grade ' + d.grade + ')' : '') + ' — ' + dateStr);
   lines.push('');
 
-  // Level & XP
-  lines.push('⭐ Level ' + lvl.level + ' — ' + lvl.title);
-  lines.push('   ' + xp + ' XP earned');
-  if (streak >= 2) {
-    lines.push('🔥 ' + streak + '-day turn-in streak!');
+  lines.push('⭐ Level ' + d.level.level + ' — ' + d.level.title + '  (' + d.xp + ' XP)');
+  if (d.streak >= 2) {
+    lines.push('🔥 ' + d.streak + '-day turn-in streak!');
+  }
+  lines.push('📈 Progress: ' + d.completed + '/' + d.total + ' completed, ' + d.turnedIn + ' turned in');
+  if (d.unlocked.length > 0) {
+    lines.push('🏆 Badges: ' + d.unlocked.map(function (b) { return b.emoji + ' ' + b.name; }).join(', '));
   }
   lines.push('');
 
-  // Overall
-  lines.push('📈 Overall Progress');
-  lines.push('   Assignments: ' + total);
-  lines.push('   Completed:   ' + completed + '/' + total + (total > 0 ? ' (' + Math.round(completed / total * 100) + '%)' : ''));
-  lines.push('   Turned In:   ' + turnedIn);
-  lines.push('   On Time:     ' + onTime);
-  lines.push('');
-
-  // This week
-  if (weekly.total > 0) {
-    lines.push('📅 This Week');
-    lines.push('   Done: ' + weekly.completed + '/' + weekly.total + ' (' + weekly.completionRate + '%)');
-    lines.push('   Turned In: ' + weekly.turnedIn);
-    lines.push('');
-  }
-
-  // Badges
-  if (unlocked.length > 0) {
-    lines.push('🏆 Badges Unlocked (' + unlocked.length + '/' + badges.length + ')');
-    unlocked.forEach(function (b) {
-      lines.push('   ' + b.emoji + ' ' + b.name);
+  if (d.rows.length > 0) {
+    lines.push('📋 Assignments');
+    lines.push('─────────────────────────────────');
+    d.rows.forEach(function (r) {
+      var statusIcon = r.status === 'Turned In' ? '✅' : (r.status === 'Done' ? '☑️' : (r.status === 'Studied' ? '✅' : '⬜'));
+      lines.push(r.icon + ' ' + r.title + '  [' + r.className + ']');
+      var detail = '   Due: ' + r.dueDate + ' (' + r.countdown + ') | ' + statusIcon + ' ' + r.status;
+      if (r.doneDate) detail += ' | Done: ' + r.doneDate;
+      if (r.turnedInDate) detail += ' | Turned In: ' + r.turnedInDate;
+      lines.push(detail);
     });
     lines.push('');
-  }
-
-  // Upcoming
-  if (upcoming.length > 0) {
-    lines.push('📋 Coming Up');
-    upcoming.forEach(function (a) {
-      var cd = DueIt.computeCountdown(a.dueDate, now);
-      var typeIcons = { homework: '📝', test: '📋', reading: '📖', project: '🎨' };
-      var icon = typeIcons[a.type || 'homework'] || '📝';
-      lines.push('   ' + icon + ' ' + a.title + ' (' + a.className + ') — ' + cd.label);
-    });
+  } else {
+    lines.push('📋 No assignments yet.');
     lines.push('');
   }
 
   lines.push('— Sent from DueIt v' + DueIt.APP_VERSION);
-
   return lines.join('\n');
 };
