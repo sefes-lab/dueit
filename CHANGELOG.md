@@ -1,5 +1,12 @@
 # DueIt — Version History
 
+## v0.53 — 2026-03-20
+
+- Color schemes now tint the entire UI, not just buttons and header
+- Backgrounds, cards, borders, input fields, and shadows all shift to match the selected accent color
+- Works in both light and dark modes with carefully tuned palettes per accent
+- 6 full-theme palettes: blue, pink, green, purple, orange, teal
+
 ## v0.52 — 2026-03-20
 
 - Native Web Share API support on mobile (📱 Share button opens system share sheet on iOS/Android)

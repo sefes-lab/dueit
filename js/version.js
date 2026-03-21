@@ -1,9 +1,15 @@
 var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {};
 (typeof globalThis !== 'undefined' ? globalThis : window).DueIt = DueIt;
 
-DueIt.APP_VERSION = '0.52';
+DueIt.APP_VERSION = '0.53';
 
 DueIt.VERSION_HISTORY = [
+  {
+    version: '0.53',
+    date: '2026-03-20',
+    description:
+      'Full-theme color schemes: accent colors now tint backgrounds, surfaces, borders, input fields, and shadows in both light and dark modes',
+  },
   {
     version: '0.52',
     date: '2026-03-20',
