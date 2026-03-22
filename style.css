@@ -573,3 +573,44 @@ dialog:not(.settings-dialog)::backdrop { background: rgba(0,0,0,0.4); }
 
 .cal-legend { display: flex; gap: 0.75rem; margin-top: 0.5rem; font-size: 0.75rem; color: var(--clr-muted); justify-content: center; }
 .cal-legend-item { display: flex; align-items: center; gap: 0.25rem; }
+
+/* ===== Mode Pill Toggle ===== */
+.mode-pill {
+  background: rgba(255,255,255,0.2);
+  color: var(--clr-on-primary);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 999px;
+  padding: 0.2rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-family);
+  min-height: 32px;
+  transition: background 0.15s;
+}
+.mode-pill:hover { background: rgba(255,255,255,0.3); }
+
+/* ===== Parent Mode: Import Header Button ===== */
+#import-header-btn { display: none; }
+body.parent-mode #import-header-btn { display: inline-flex; }
+
+/* ===== Parent Mode: Hide Gamification ===== */
+body.parent-mode #xp-bar-container,
+body.parent-mode #streak-banner,
+body.parent-mode #weekly-stats-container,
+body.parent-mode .badges-section { display: none; }
+
+/* ===== Parent Mode: Progress Summary ===== */
+.progress-summary { display: none; gap: 0.5rem; margin-bottom: 0.75rem; justify-content: center; }
+body.parent-mode .progress-summary { display: flex; }
+.progress-stat {
+  flex: 1; text-align: center; padding: 0.5rem 0.25rem;
+  background: var(--clr-surface); border: 1px solid var(--clr-border);
+  border-radius: var(--radius); min-width: 0;
+}
+.progress-stat-value {
+  font-size: 1.2rem; font-weight: 700; color: var(--clr-primary); display: block;
+}
+.progress-stat-label {
+  font-size: 0.65rem; color: var(--clr-muted); text-transform: uppercase; letter-spacing: 0.03em;
+}

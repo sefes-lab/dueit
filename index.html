@@ -18,8 +18,10 @@
   <header class="app-header">
     <h1 id="app-title">DueIt</h1>
     <div class="header-actions">
-      <button type="button" class="icon-btn" id="share-btn" aria-label="Share progress report" title="Share Progress">📤</button>
-      <button type="button" class="icon-btn" id="calendar-sync-btn" aria-label="Sync assignments to calendar" title="Sync to Calendar">🔄</button>
+      <button type="button" class="mode-pill" id="mode-toggle-btn" title="Switch to Parent mode" aria-label="Switch to Parent mode">Student</button>
+      <button type="button" class="icon-btn" id="import-header-btn" aria-label="Import data" title="Import Data">⬇️</button>
+      <input type="file" id="import-header-file" accept=".json" hidden />
+      <button type="button" class="icon-btn" id="share-btn" aria-label="Share progress report" title="Share Progress">⬆️</button>
       <button type="button" class="icon-btn" id="print-btn" aria-label="Print assignments" title="Print">🖨️</button>
       <button type="button" class="icon-btn" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">🌙</button>
       <button type="button" class="icon-btn" id="settings-open-btn" aria-label="Open settings" title="Settings">⚙️</button>
@@ -77,6 +79,7 @@
         <button type="button" class="icon-btn" id="calendar-toggle-btn" aria-label="Toggle calendar view" title="Calendar view">📅</button>
       </div>
       <div id="xp-bar-container"></div>
+      <div id="progress-summary" class="progress-summary"></div>
       <div id="streak-banner"></div>
       <div id="weekly-stats-container"></div>
       <div id="calendar-view" hidden></div>
@@ -129,7 +132,7 @@
       </section>
 
       <!-- Achievements -->
-      <section class="settings-section">
+      <section class="settings-section badges-section">
         <h3>🏆 Achievements</h3>
         <div id="badges-grid" class="badges-grid"></div>
       </section>
@@ -145,13 +148,14 @@
         <ul id="class-list"></ul>
       </section>
 
-      <!-- Import / Export -->
+      <!-- Data & Sync -->
       <section class="settings-section">
-        <h3>Import / Export</h3>
+        <h3>Data & Sync</h3>
         <div class="import-export-actions">
           <button type="button" class="btn btn-primary" id="export-btn">Export Data</button>
           <label class="btn btn-secondary import-label" for="import-file">Import Data</label>
           <input type="file" id="import-file" accept=".json" hidden />
+          <button type="button" class="btn btn-secondary" id="calendar-sync-btn">🔄 Sync to Calendar</button>
         </div>
       </section>
     </div>
@@ -171,7 +175,7 @@
   <!-- Share Progress Dialog -->
   <dialog id="share-dialog" class="share-dialog">
     <div class="dialog-header">
-      <h2>📤 Share Progress</h2>
+      <h2>⬆️ Share Progress</h2>
       <button type="button" class="icon-btn" id="share-close-btn" aria-label="Close share dialog">&times;</button>
     </div>
     <div class="share-body">
@@ -214,7 +218,7 @@
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js?v=0.58').then(function (reg) {
+      navigator.serviceWorker.register('./sw.js?v=0.6').then(function (reg) {
         // Force check for updated SW on every page load
         reg.update();
       }).catch(function () {});

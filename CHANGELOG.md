@@ -1,5 +1,15 @@
 # DueIt — Version History
 
+## v0.6 — 2026-03-21
+
+- Parent Mode: [Student] / [Parent] pill toggle in header switches between views
+- Parent mode hides gamification (XP bar, streak banner, weekly stats, badges, level-up toasts, confetti)
+- Parent mode shows a progress summary panel (total, completed, overdue counts)
+- Header reorganized: ⬆️ replaces 📤 for Share; ⬇️ Import button shown in Parent mode
+- Calendar Sync (🔄) moved from header to Settings under new "Data & Sync" section
+- Smart merge on import: compares `updatedAt` timestamps per assignment, keeps newer version, adds new items, retains local-only items, unions classes, preserves local preferences
+- Export uses Web Share API on mobile (opens share sheet for AirDrop, Messages, etc.) with download fallback on desktop
+
 ## v0.58 — 2026-03-21
 
 - "📎 Attach data" checkbox in Share Progress dialog

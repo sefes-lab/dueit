@@ -64,6 +64,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     renderXPBar();
     renderWeeklyStats();
     renderBadges();
+    renderProgressSummary();
     updateTitle();
     updateCalendarVisibility();
   }
@@ -124,6 +125,24 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     }
     persist();
   }
+  function applyMode(mode) {
+    if (mode !== 'parent') mode = 'student';
+    state.preferences.mode = mode;
+    var pill = document.getElementById('mode-toggle-btn');
+    if (mode === 'parent') {
+      document.body.classList.add('parent-mode');
+      pill.textContent = 'Parent';
+      pill.title = 'Switch to Student mode';
+      pill.setAttribute('aria-label', 'Switch to Student mode');
+    } else {
+      document.body.classList.remove('parent-mode');
+      pill.textContent = 'Student';
+      pill.title = 'Switch to Parent mode';
+      pill.setAttribute('aria-label', 'Switch to Parent mode');
+    }
+    persist();
+  }
+
   var FONT_MAP = {
       'system':       { family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', url: null },
       'nunito':       { family: '"Nunito", sans-serif',       url: 'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap' },
@@ -205,7 +224,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     var info = DueIt.computeLevel(xp);
 
     // Detect level-up
-    if (lastLevel > 0 && info.level > lastLevel) {
+    if (lastLevel > 0 && info.level > lastLevel && state.preferences.mode !== 'parent') {
       showLevelUpToast(info.level, info.title);
       setTimeout(function () {
         var wrapper = el.querySelector('.xp-bar-wrapper');
@@ -266,6 +285,33 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
         '<span class="badge-desc">' + _esc(b.desc) + '</span>' +
       '</div>';
     }).join('');
+  }
+
+  function renderProgressSummary() {
+    var el = document.getElementById('progress-summary');
+    if (!el) return;
+    if (state.preferences.mode !== 'parent') { el.innerHTML = ''; return; }
+    var now = new Date();
+    var total = state.assignments.length;
+    var completed = state.assignments.filter(function (a) { return a.isComplete || a.isStudied; }).length;
+    var overdue = state.assignments.filter(function (a) {
+      var isDone = a.isComplete || a.isStudied;
+      if (isDone) return false;
+      return new Date(a.dueDate + 'T23:59:59') < now;
+    }).length;
+    el.innerHTML =
+      '<div class="progress-stat">' +
+        '<span class="progress-stat-value">' + total + '</span>' +
+        '<span class="progress-stat-label">Total</span>' +
+      '</div>' +
+      '<div class="progress-stat">' +
+        '<span class="progress-stat-value">' + completed + '</span>' +
+        '<span class="progress-stat-label">Completed</span>' +
+      '</div>' +
+      '<div class="progress-stat">' +
+        '<span class="progress-stat-value">' + overdue + '</span>' +
+        '<span class="progress-stat-label">Overdue</span>' +
+      '</div>';
   }
 
   function showLevelUpToast(level, title) {
@@ -348,7 +394,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
       var wasTurnedIn = state.assignments.filter(function (a) { return a.id === id; })[0];
       state.assignments = DueIt.toggleTurnedIn(state.assignments, id);
       persist(); renderAll();
-      if (wasTurnedIn && !wasTurnedIn.isTurnedIn) spawnConfetti();
+      if (wasTurnedIn && !wasTurnedIn.isTurnedIn && state.preferences.mode !== 'parent') spawnConfetti();
     } else if (btn.classList.contains('toggle-studied-btn')) {
       state.assignments = DueIt.toggleStudied(state.assignments, id);
       persist(); renderAll();
@@ -681,13 +727,16 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
         e.target.value = '';
         return;
       }
-      showConfirm('Importing will replace all current data. Continue?').then(function (confirmed) {
+      showConfirm('Merge imported data with your current data?').then(function (confirmed) {
         if (!confirmed) { e.target.value = ''; return; }
-        state.assignments = result.data.assignments;
-        state.classes = result.data.classes;
-        state.preferences = result.data.preferences || {};
+        var merged = DueIt.mergeImportData(
+          { assignments: state.assignments, classes: state.classes, preferences: state.preferences },
+          result.data
+        );
+        state.assignments = merged.assignments;
+        state.classes = merged.classes;
+        // Keep local preferences (merge doesn't overwrite them)
         persist(); renderAll();
-        if (state.preferences.theme) applyTheme(state.preferences.theme);
         e.target.value = '';
       });
     }).catch(function () {
@@ -701,6 +750,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     applyTheme(state.preferences.theme || 'light');
     applyAccent(state.preferences.accent || 'blue');
     applyFont(state.preferences.font || 'system');
+    applyMode(state.preferences.mode || 'student');
     renderAll();
     document.getElementById('footer-version').textContent = 'DueIt v' + DueIt.APP_VERSION;
 
@@ -722,6 +772,17 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     document.getElementById('export-btn').addEventListener('click', handleExport);
     document.getElementById('import-file').addEventListener('change', handleImport);
     document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+
+    document.getElementById('mode-toggle-btn').addEventListener('click', function () {
+      var newMode = state.preferences.mode === 'parent' ? 'student' : 'parent';
+      applyMode(newMode);
+      renderAll();
+    });
+
+    document.getElementById('import-header-btn').addEventListener('click', function () {
+      document.getElementById('import-header-file').click();
+    });
+    document.getElementById('import-header-file').addEventListener('change', handleImport);
 
     document.getElementById('calendar-toggle-btn').addEventListener('click', function () {
       calendarMode = !calendarMode;

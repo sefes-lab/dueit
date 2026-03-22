@@ -29,14 +29,64 @@ DueIt.deserializePlannerData = function deserializePlannerData(json) {
 DueIt.triggerExportDownload = function triggerExportDownload(data) {
   var json = DueIt.serializePlannerData(data);
   var blob = new Blob([json], { type: 'application/json' });
+  var file = new File([blob], 'dueit-data.json', { type: 'application/json' });
+
+  // Try Web Share API with file (mobile)
+  if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+    navigator.share({ title: 'DueIt Data', files: [file] }).catch(function () {
+      _downloadBlob(blob);
+    });
+  } else {
+    _downloadBlob(blob);
+  }
+};
+
+function _downloadBlob(blob) {
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
   a.href = url;
-  a.download = 'dueit-export-' + new Date().toISOString().slice(0, 10) + '.json';
+  a.download = 'dueit-data.json';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+}
+
+DueIt.mergeImportData = function mergeImportData(local, imported) {
+  var localMap = {};
+  local.assignments.forEach(function (a) { localMap[a.id] = a; });
+
+  var merged = [];
+  var seen = {};
+
+  // Process imported assignments
+  (imported.assignments || []).forEach(function (a) {
+    seen[a.id] = true;
+    var existing = localMap[a.id];
+    if (!existing) {
+      merged.push(a);
+    } else {
+      var importedTime = new Date(a.updatedAt || 0).getTime();
+      var localTime = new Date(existing.updatedAt || 0).getTime();
+      merged.push(importedTime > localTime ? a : existing);
+    }
+  });
+
+  // Retain local-only assignments
+  local.assignments.forEach(function (a) {
+    if (!seen[a.id]) merged.push(a);
+  });
+
+  // Union classes (no duplicates)
+  var classSet = {};
+  (local.classes || []).forEach(function (c) { classSet[c] = true; });
+  (imported.classes || []).forEach(function (c) { classSet[c] = true; });
+
+  return {
+    assignments: merged,
+    classes: Object.keys(classSet),
+    preferences: local.preferences,
+  };
 };
 
 DueIt.readFileAsText = function readFileAsText(file) {

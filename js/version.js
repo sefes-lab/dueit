@@ -1,9 +1,15 @@
 var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {};
 (typeof globalThis !== 'undefined' ? globalThis : window).DueIt = DueIt;
 
-DueIt.APP_VERSION = '0.58';
+DueIt.APP_VERSION = '0.6';
 
 DueIt.VERSION_HISTORY = [
+  {
+    version: '0.6',
+    date: '2026-03-21',
+    description:
+      'Parent Mode: toggle between Student and Parent views via header pill button; Parent mode hides gamification (XP, badges, streaks, weekly stats) and shows a progress summary (total, completed, overdue); header reorganized with ⬆️ Share and ⬇️ Import icons; Calendar Sync moved to Settings under new Data & Sync section; smart merge on import (timestamp-based conflict resolution keeps newer records); Export uses Web Share API on mobile',
+  },
   {
     version: '0.58',
     date: '2026-03-21',
