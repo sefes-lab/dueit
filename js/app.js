@@ -650,25 +650,35 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     var name = (state.preferences.studentName || '').trim();
     var first = name.split(' ')[0] || 'Student';
     var feedback = document.getElementById('share-feedback');
+    var attachChecked = document.getElementById('share-attach-data').checked;
 
     var shareData = {
       title: first + "'s DueIt Progress Report",
       text: report,
     };
 
+    var fileToDownload = null;
+
     // Include JSON data file if attach checkbox is checked
-    if (document.getElementById('share-attach-data').checked) {
+    if (attachChecked) {
       var file = buildExportFile();
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         shareData.files = [file];
+      } else {
+        // Browser doesn't support file sharing — download separately
+        fileToDownload = file;
       }
     }
 
     navigator.share(shareData).then(function () {
-      feedback.textContent = '✓ Shared!';
+      if (fileToDownload) {
+        downloadFile(fileToDownload);
+        feedback.textContent = '✓ Shared! Data file downloaded — send it separately.';
+      } else {
+        feedback.textContent = '✓ Shared!';
+      }
       feedback.style.color = 'var(--clr-complete)';
     }).catch(function (err) {
-      // User cancelled — not an error
       if (err.name !== 'AbortError') {
         feedback.textContent = 'Could not share. Try Copy instead.';
         feedback.style.color = 'var(--clr-danger)';
