@@ -6,6 +6,9 @@ node_modules
 # Kiro specs
 .kiro/
 
+# Kiro context transfer
+CONTEXT_TRANSFER.md
+
 # Editor directories and files
 .vscode/*
 !.vscode/settings.json
