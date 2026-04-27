@@ -1,130 +1,85 @@
 # DueIt — Homework Planner
 
-## What Is DueIt?
+## The Story
 
-DueIt is a free homework planner designed for middle school students. It runs right in your web browser — no downloads, no accounts, no ads. Students use it to keep track of assignments, due dates, and progress, while a built-in rewards system makes staying organized feel more like a game than a chore.
+DueIt started with a simple problem: keeping track of homework shouldn't be harder than doing the homework itself. Too many planners are either cluttered with features students don't need, or so bare-bones that they're not worth opening. DueIt was built to land somewhere in between — easy enough to use in seconds, rewarding enough to keep coming back to.
 
-Parents can switch to a dedicated Parent Mode to review their child's assignments, check progress, and even make updates — all without disrupting the student's experience.
+What began in March 2026 as a basic assignment list with due dates quickly grew into something more. Color themes arrived to make it feel personal. A calendar view gave students a bird's-eye look at their week. Then came the gamification — an XP system, levels, badges, and confetti — because there's something satisfying about watching a progress bar fill up when you turn in your work on time.
 
-## Who Is It For?
+As the app matured, it became clear that parents wanted in too. Not to take over, but to stay informed. Parent Mode was the answer: a clean, distraction-free view of the same data, with tools to review assignments, make corrections, and send updates back. The student's game stays intact. The parent gets peace of mind.
 
-DueIt was built with two audiences in mind:
+## What It Does
 
-- **Students** (middle school age) who need a simple, fun way to track homework, tests, readings, and projects across all their classes
-- **Parents** who want visibility into what's due, what's done, and what might be falling behind — without hovering over their child's shoulder
+At its core, DueIt is a place to track assignments. Students add their homework, tests, readings, and projects, set due dates, and mark things off as they go. The tracker sorts everything by urgency — what's due today glows, what's overdue turns red, and what's done gets a satisfying line through it.
 
-## Why DueIt?
+But DueIt goes beyond a checklist. Every completed assignment earns XP. Turning work in on time earns bonus XP. Study for a test, earn more. As XP accumulates, students level up — from Freshman all the way to Legend — and unlock achievement badges along the way. It's a small thing, but it turns "I should probably write down my homework" into "I'm 30 XP away from the next level."
 
-Most homework tools are either too complicated for younger students or too basic to be useful. DueIt hits a sweet spot:
+The calendar view lays out the month with colored dots showing what's due each day. Tests get highlighted so they don't sneak up. A streak counter tracks consecutive days of turning in work. Weekly stats show how the current week is going at a glance.
 
-- **Simple enough** that a student can start using it in under a minute
-- **Fun enough** that they actually want to come back (XP, levels, badges, confetti)
-- **Useful enough** that parents get real insight into their child's workload
-- **Private** — all data stays on the device, nothing is sent to a server
+For parents, switching to Parent Mode strips away the game layer and presents a straightforward summary: how many assignments exist, how many are done, and how many are overdue. Parents can import their child's data, review everything, add missing assignments or fix mistakes, and send the updated data back. A smart merge system ensures that neither side's changes get lost in the exchange.
 
-## Features
+## Who It's For
 
-### For Students
+DueIt works for any student juggling multiple classes and assignments — whether that's a sixth grader keeping track of spelling tests or a high schooler managing AP coursework. It's deliberately simple: no accounts to create, no passwords to remember, no subscriptions to manage. Open it in a browser and start adding assignments.
 
-- **Add assignments** with class, type (homework, test, reading, project), and due date
-- **Track progress** — mark assignments as Done, Turned In, or Studied
-- **Earn XP** for completing work, turning it in, and turning it in on time
-- **Level up** from Freshman to Legend across 10 levels
-- **Unlock badges** for milestones like completing your first assignment, hitting a 5-day streak, or acing a perfect week
-- **Calendar view** — see what's due on a monthly calendar with colored dots for each class
-- **Countdown tracker** — assignments sorted by due date with "Due today," "Due tomorrow," and "Overdue" labels
-- **Urgency glow** — assignments due soon pulse gently to catch your attention
-- **Confetti** — because turning in homework deserves a little celebration
-- **Dark mode** and 6 color themes to make it your own
-- **Font picker** — choose from 6 fonts including fun handwriting styles
-- **Share progress** with a parent or teacher via email, text, or any messaging app
-- **Works offline** — once loaded, DueIt works without an internet connection
+Parents benefit from the same simplicity. Parent Mode doesn't require a separate app or login. It's the same DueIt, just with a different lens — focused on status and progress rather than points and badges.
 
-### For Parents
+## What Makes It Different
 
-- **Parent Mode** — a clean view that hides the gamification and shows a simple progress summary (total assignments, completed, overdue)
-- **Import your child's data** — your child shares their data file, you import it and see everything
-- **Make updates** — add missing assignments, fix due dates, mark things as done
-- **Send updates back** — export the updated data and send it back; the app merges changes intelligently so neither side loses work
-- **Print reports** — generate a printable assignment report with status and dates
+Privacy is built in, not bolted on. DueIt stores everything locally on the device. Nothing is sent to a server. There are no analytics, no tracking, no ads. The data belongs to the student and stays on their device unless they choose to share it.
 
-### Shared Features
+The app works offline once it's been loaded, and it can be installed to a phone's home screen like a native app. It runs on any modern browser — Chrome, Safari, Firefox, Edge — on any device.
 
-- **6 color themes** that tint the entire interface (not just buttons)
-- **6 font choices** from clean to playful
-- **Calendar sync** — export assignments as calendar events (.ics file) with reminders
-- **Data portability** — export and import all data as a simple JSON file
-- **In-app help** — context-sensitive help guide that adapts to Student or Parent mode
-- **Works on any device** — phone, tablet, laptop, desktop
-- **Installable** — add it to your home screen like a regular app
+Customization goes deeper than most student tools. The app header personalizes itself with the student's name — "April's DueIt" instead of just "DueIt" — making it feel like it belongs to them. Six color themes tint the entire interface, not just a header bar. Six font choices range from clean and modern to playful handwriting styles. Dark mode is a tap away. These aren't just cosmetic — when a student makes the app feel like theirs, they're more likely to use it.
 
-## How It Works
+Data portability is a first-class feature. Everything can be exported as a simple file and imported on another device. The share feature sends a formatted progress report via email or any messaging app, with an option to attach the raw data so a parent can import it directly. Calendar sync exports assignments as calendar events with built-in reminders.
 
-1. **Open DueIt** in any web browser (or install it to your home screen)
-2. **Add your classes** in Settings — or use the defaults
-3. **Add assignments** as they come in — pick the class, type, due date, and name
-4. **Track your progress** — tap Done when you finish, Turn In when you hand it in
-5. **Watch your XP grow** and unlock badges as you stay on top of things
-6. **Share with your parent** — tap the share button to send a progress report
+## The Parent-Student Connection
 
-For parents: tap the **[Student]** pill in the header to switch to **[Parent]** mode, import your child's data, review, and send updates back.
+The data exchange between parent and student is one of DueIt's most practical features. Here's how it typically works: the student shares their progress report with the data file attached. The parent opens DueIt in Parent Mode, imports the file, and sees everything — what's due, what's done, what's overdue. If the parent notices a missing assignment or a wrong due date, they fix it and share the updated file back. When the student imports it, the app compares timestamps and keeps the most recent version of each assignment. Work done by either side is preserved.
 
-## Privacy
+This back-and-forth doesn't require both people to be on the same device or even the same network. It works through email, text messages, AirDrop, or any file-sharing method. It's low-tech by design — no server sync to configure, no accounts to link.
 
-DueIt stores everything locally on your device using your browser's built-in storage. No data is ever sent to a server. No accounts. No tracking. No ads. Your homework is your business.
+## A Brief History
 
-If you clear your browser data, your assignments will be lost — so use the Export feature to back up your data periodically.
+DueIt has evolved steadily since its first release:
+
+- **v0.1** — The beginning: assignment tracking, class management, due date countdown, data export
+- **v0.2** — Color themes, confetti on turn-in, streak counter, urgency glow
+- **v0.3** — Assignment types with unique icons; tests get a "Studied" toggle
+- **v0.4** — Calendar view with monthly grid, assignment dots, and tooltips
+- **v0.5** — Gamification: XP, 10 levels, achievement badges, weekly stats
+- **v0.51–0.54** — Progress sharing, mobile Web Share API, network-first caching
+- **v0.55–0.58** — Unified reports, calendar sync with reminders, font picker, attach data in share
+- **v0.6** — Parent Mode, smart merge import, header redesign
+- **v0.61** — In-app help with context-sensitive guides
+
+Built with care for one student, shared for anyone who needs it.
+
+DueIt was created by Simon Fleischmann in 2026.
 
 ## Frequently Asked Questions
 
 **Do I need to create an account?**
-No. DueIt works entirely in your browser with no sign-up required.
+No. DueIt works entirely in your browser with no sign-up, no login, and no personal information required.
 
 **Does it cost anything?**
-No. DueIt is completely free.
+DueIt is completely free with no ads or in-app purchases.
 
-**Will my data be safe?**
-Your data is stored locally on your device. It's never sent anywhere. Use Export to back it up.
+**Is my data private?**
+Yes. Everything is stored locally on your device. Nothing is ever sent to a server or shared with anyone unless you choose to export or share it yourself.
 
-**Can I use it on my phone?**
-Yes. DueIt works on any device with a web browser. You can add it to your home screen for quick access.
+**What devices does it work on?**
+Any device with a modern web browser — phones, tablets, laptops, desktops. It can also be added to your home screen for quick access, where it looks and feels like a regular app.
 
-**What happens if I clear my browser data?**
-Your assignments will be deleted. Always export your data first if you plan to clear your browser.
+**What if I clear my browser data?**
+Your assignments will be lost. Use the Export feature in Settings to save a backup file before clearing your browser.
 
 **How does Parent Mode work?**
-Tap the [Student] pill in the header to switch to [Parent]. It hides the game-like elements and shows a clean progress overview. Parents can import their child's data, make changes, and send it back.
-
-**How do I share data between student and parent?**
-The student taps ⬆️ Share with "Attach data" checked, which sends a progress report plus a data file. The parent imports that file in Parent Mode. After making changes, the parent shares it back the same way. The app merges both versions intelligently.
-
-**What does "smart merge" mean?**
-When you import a file, DueIt compares each assignment and keeps the most recently updated version. If the student marked something as done while the parent was editing something else, both changes are preserved.
+Tapping the mode pill in the header switches between Student and Parent views. Parent Mode hides the gamification elements and shows a clean progress summary. Parents can import their child's data, make changes, and send it back — the app merges both versions automatically.
 
 **Can multiple students use it on the same device?**
-Not currently — DueIt stores one set of data per browser. Each student would need their own browser profile or device.
+Each browser profile stores one set of data. For multiple students on the same device, each would need their own browser profile — or they can export and import their data when switching.
 
 **Does it work without internet?**
-Yes. Once you've loaded DueIt, it works offline. You'll need internet again to sync calendar events or share via email.
-
-**What browsers are supported?**
-DueIt works in Chrome, Safari, Firefox, and Edge — on both desktop and mobile.
-
-## A Brief History
-
-DueIt started as a simple homework tracker in March 2026 — just a form, a list, and a due date countdown. Over the following weeks it grew into a full-featured planner:
-
-- **v0.1** — Basic assignment tracking with classes, due dates, and data export
-- **v0.2** — Color themes, confetti animations, streak counter
-- **v0.3** — Assignment types (homework, test, reading, project) with unique icons
-- **v0.4** — Calendar view with monthly grid and assignment dots
-- **v0.5** — Gamification: XP system, 10 levels, achievement badges, weekly stats
-- **v0.51–0.54** — Share progress reports, mobile sharing, network-first caching
-- **v0.55** — Unified share and print reports
-- **v0.56** — Calendar sync via .ics export with reminders
-- **v0.57** — Font picker with 6 font choices
-- **v0.58** — Attach data option in share dialog
-- **v0.6** — Parent Mode with progress summary, smart merge import, header redesign
-- **v0.61** — In-app help with mode-specific guides
-
-Built with care for one student, shared for anyone who needs it.
+Yes. Once loaded, DueIt works fully offline. An internet connection is only needed to share via email or sync to a calendar app.
