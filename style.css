@@ -451,12 +451,12 @@ input:focus, textarea:focus, select:focus {
 .assignment-actions { display: flex; gap: 0.35rem; margin-top: 0.5rem; flex-wrap: wrap; }
 
 /* ===== Confirmation Dialog ===== */
-dialog:not(.settings-dialog) {
+dialog:not(.settings-dialog):not(.share-dialog):not(.help-dialog) {
   border: none; border-radius: var(--radius); padding: 1.5rem;
   box-shadow: 0 4px 24px rgba(0,0,0,0.15); max-width: 400px; width: 90%;
   background: var(--clr-surface); color: var(--clr-text);
 }
-dialog:not(.settings-dialog)::backdrop { background: rgba(0,0,0,0.4); }
+dialog:not(.settings-dialog):not(.share-dialog):not(.help-dialog)::backdrop { background: rgba(0,0,0,0.4); }
 .dialog-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem; }
 
 /* ===== Storage Warning ===== */
