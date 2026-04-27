@@ -1,5 +1,12 @@
 # DueIt — Version History
 
+## v0.61 — 2026-04-27
+
+- In-app help: ❓ button in header opens a context-sensitive help guide
+- Student mode guide covers adding assignments, tracking progress, earning XP, badges, calendar view, sharing, and customization
+- Parent mode guide covers progress summary, importing child's data, reviewing/updating assignments, sending updates back via smart merge, and printing reports
+- Help content adapts automatically when switching modes
+
 ## v0.6 — 2026-03-21
 
 - Parent Mode: [Student] / [Parent] pill toggle in header switches between views

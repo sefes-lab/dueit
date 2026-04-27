@@ -1,9 +1,15 @@
 var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {};
 (typeof globalThis !== 'undefined' ? globalThis : window).DueIt = DueIt;
 
-DueIt.APP_VERSION = '0.6';
+DueIt.APP_VERSION = '0.61';
 
 DueIt.VERSION_HISTORY = [
+  {
+    version: '0.61',
+    date: '2026-04-27',
+    description:
+      'In-app help: ❓ button in header opens a help guide; content adapts to current mode — Student guide covers XP, badges, and assignment workflow; Parent guide covers progress summary, data exchange, and smart merge',
+  },
   {
     version: '0.6',
     date: '2026-03-21',

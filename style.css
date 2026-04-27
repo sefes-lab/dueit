@@ -614,3 +614,27 @@ body.parent-mode .progress-summary { display: flex; }
 .progress-stat-label {
   font-size: 0.65rem; color: var(--clr-muted); text-transform: uppercase; letter-spacing: 0.03em;
 }
+
+/* ===== Help Dialog ===== */
+.help-dialog {
+  border: none; border-radius: var(--radius); padding: 0;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+  max-width: 520px; width: 92%;
+  background: var(--clr-surface); color: var(--clr-text);
+  max-height: 90vh;
+}
+.help-dialog::backdrop { background: rgba(0,0,0,0.5); }
+.help-body {
+  padding: 1.25rem; overflow-y: auto; max-height: calc(90vh - 60px);
+  font-size: 0.9rem; line-height: 1.6;
+}
+.help-body h3 { font-size: 1rem; margin: 1rem 0 0.4rem; color: var(--clr-primary); }
+.help-body h3:first-child { margin-top: 0; }
+.help-body p { margin-bottom: 0.5rem; }
+.help-body ul { margin: 0.25rem 0 0.75rem 1.25rem; }
+.help-body li { margin-bottom: 0.3rem; }
+.help-body .help-tip {
+  background: var(--clr-bg); border: 1px solid var(--clr-border);
+  border-radius: var(--radius); padding: 0.6rem 0.75rem;
+  margin: 0.5rem 0; font-size: 0.85rem;
+}

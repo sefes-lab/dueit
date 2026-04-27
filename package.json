@@ -1,7 +1,7 @@
 {
   "name": "dueit",
   "private": true,
-  "version": "0.6.0",
+  "version": "0.61.0",
   "type": "module",
   "scripts": {
     "test": "vitest --run"

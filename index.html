@@ -24,6 +24,7 @@
       <button type="button" class="icon-btn" id="share-btn" aria-label="Share progress report" title="Share Progress">⬆️</button>
       <button type="button" class="icon-btn" id="print-btn" aria-label="Print assignments" title="Print">🖨️</button>
       <button type="button" class="icon-btn" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">🌙</button>
+      <button type="button" class="icon-btn" id="help-btn" aria-label="Help" title="Help">❓</button>
       <button type="button" class="icon-btn" id="settings-open-btn" aria-label="Open settings" title="Settings">⚙️</button>
     </div>
   </header>
@@ -196,6 +197,15 @@
     </div>
   </dialog>
 
+  <!-- Help Dialog -->
+  <dialog id="help-dialog" class="help-dialog">
+    <div class="dialog-header">
+      <h2 id="help-title">Help</h2>
+      <button type="button" class="icon-btn" id="help-close-btn" aria-label="Close help">&times;</button>
+    </div>
+    <div class="help-body" id="help-body"></div>
+  </dialog>
+
   <!-- Storage Warning Banner -->
   <div id="storage-warning" class="storage-warning" hidden>
     <p>⚠️ localStorage is unavailable. Your data will not be saved automatically. Use Export/Import to save your work.</p>
@@ -218,7 +228,7 @@
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js?v=0.6').then(function (reg) {
+      navigator.serviceWorker.register('./sw.js?v=0.61').then(function (reg) {
         // Force check for updated SW on every page load
         reg.update();
       }).catch(function () {});
