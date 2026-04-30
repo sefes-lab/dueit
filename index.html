@@ -173,6 +173,33 @@
     </form>
   </dialog>
 
+  <!-- Grade Entry Dialog -->
+  <dialog id="grade-dialog" class="grade-dialog">
+    <div class="grade-dialog-inner">
+      <div class="grade-dialog-header">
+        <span class="grade-dialog-emoji" id="grade-emoji">📊</span>
+        <h2 id="grade-dialog-title">Enter Grade</h2>
+      </div>
+      <p class="grade-dialog-assignment" id="grade-dialog-assignment"></p>
+      <div class="grade-quick-picks">
+        <button type="button" class="grade-pick grade-pick-a" data-score="95">A</button>
+        <button type="button" class="grade-pick grade-pick-b" data-score="85">B</button>
+        <button type="button" class="grade-pick grade-pick-c" data-score="75">C</button>
+        <button type="button" class="grade-pick grade-pick-d" data-score="65">D</button>
+        <button type="button" class="grade-pick grade-pick-f" data-score="50">F</button>
+      </div>
+      <div class="grade-exact-row">
+        <label for="grade-input">Exact score</label>
+        <input type="number" id="grade-input" min="0" max="100" step="1" placeholder="0–100" />
+        <span class="grade-live-letter" id="grade-live-letter"></span>
+      </div>
+      <div class="grade-dialog-actions">
+        <button type="button" class="btn btn-primary" id="grade-save-btn">Save Grade</button>
+        <button type="button" class="btn btn-secondary" id="grade-cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </dialog>
+
   <!-- Share Progress Dialog -->
   <dialog id="share-dialog" class="share-dialog">
     <div class="dialog-header">

@@ -452,12 +452,12 @@ input:focus, textarea:focus, select:focus {
 .assignment-actions { display: flex; gap: 0.35rem; margin-top: 0.5rem; flex-wrap: wrap; }
 
 /* ===== Confirmation Dialog ===== */
-dialog:not(.settings-dialog):not(.share-dialog):not(.help-dialog) {
+dialog:not(.settings-dialog):not(.share-dialog):not(.help-dialog):not(.grade-dialog) {
   border: none; border-radius: var(--radius); padding: 1.5rem;
   box-shadow: 0 4px 24px rgba(0,0,0,0.15); max-width: 400px; width: 90%;
   background: var(--clr-surface); color: var(--clr-text);
 }
-dialog:not(.settings-dialog):not(.share-dialog):not(.help-dialog)::backdrop { background: rgba(0,0,0,0.4); }
+dialog:not(.settings-dialog):not(.share-dialog):not(.help-dialog):not(.grade-dialog)::backdrop { background: rgba(0,0,0,0.4); }
 .dialog-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem; }
 
 /* ===== Storage Warning ===== */
@@ -654,3 +654,59 @@ body.parent-mode .progress-summary { display: flex; }
   font-size: 0.7rem; font-weight: 700; padding: 0.15rem 0.5rem;
   border-radius: 999px; margin-left: 0.5rem; vertical-align: middle;
 }
+
+/* ===== Grade Dialog ===== */
+.grade-dialog {
+  border: none; border-radius: var(--radius); padding: 0;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+  max-width: 340px; width: 90%;
+  background: var(--clr-surface); color: var(--clr-text);
+  overflow: visible;
+}
+.grade-dialog::backdrop { background: rgba(0,0,0,0.5); }
+.grade-dialog-inner { padding: 1.25rem; text-align: center; }
+.grade-dialog-header { margin-bottom: 0.5rem; }
+.grade-dialog-emoji { font-size: 2.5rem; display: block; margin-bottom: 0.25rem; transition: all 0.3s; }
+.grade-dialog-header h2 { font-size: 1.1rem; margin: 0; }
+.grade-dialog-assignment {
+  font-size: 0.85rem; color: var(--clr-muted); margin-bottom: 0.75rem;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.grade-quick-picks {
+  display: flex; gap: 0.4rem; justify-content: center; margin-bottom: 0.75rem;
+}
+.grade-pick {
+  width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--clr-border);
+  font-size: 1.1rem; font-weight: 700; cursor: pointer;
+  background: var(--clr-surface); color: var(--clr-text);
+  transition: transform 0.15s, border-color 0.15s, background 0.15s;
+  font-family: var(--font-family);
+}
+.grade-pick:hover { transform: scale(1.1); }
+.grade-pick.active { border-width: 3px; transform: scale(1.15); color: #fff; }
+.grade-pick-a { border-color: #00b894; }
+.grade-pick-a.active, .grade-pick-a:hover { background: #00b894; color: #fff; border-color: #00b894; }
+.grade-pick-b { border-color: #0984e3; }
+.grade-pick-b.active, .grade-pick-b:hover { background: #0984e3; color: #fff; border-color: #0984e3; }
+.grade-pick-c { border-color: #f39c12; }
+.grade-pick-c.active, .grade-pick-c:hover { background: #f39c12; color: #fff; border-color: #f39c12; }
+.grade-pick-d { border-color: #e17055; }
+.grade-pick-d.active, .grade-pick-d:hover { background: #e17055; color: #fff; border-color: #e17055; }
+.grade-pick-f { border-color: #e74c3c; }
+.grade-pick-f.active, .grade-pick-f:hover { background: #e74c3c; color: #fff; border-color: #e74c3c; }
+
+.grade-exact-row {
+  display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;
+  justify-content: center;
+}
+.grade-exact-row label { font-size: 0.8rem; color: var(--clr-muted); white-space: nowrap; }
+.grade-exact-row input {
+  width: 80px; text-align: center; font-size: 1.1rem; font-weight: 700;
+  padding: 0.4rem; border-radius: var(--radius);
+  border: 1px solid var(--clr-border); background: var(--clr-input-bg); color: var(--clr-text);
+}
+.grade-live-letter {
+  font-size: 1.2rem; font-weight: 700; min-width: 1.5rem;
+}
+.grade-dialog-actions { display: flex; gap: 0.5rem; justify-content: center; }
+.grade-dialog-actions .btn { min-width: 100px; }

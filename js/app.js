@@ -409,17 +409,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
       }
     } else if (btn.classList.contains('grade-btn')) {
       var currentAssignment = state.assignments.filter(function (a) { return a.id === id; })[0];
-      var currentGrade = (currentAssignment && typeof currentAssignment.grade === 'number') ? currentAssignment.grade : '';
-      var input = prompt('Enter grade (0–100):', currentGrade);
-      if (input !== null && input.trim() !== '') {
-        var result = DueIt.setGrade(state.assignments, id, input.trim());
-        if (result.error) {
-          alert(result.error);
-        } else {
-          state.assignments = result.assignments;
-          persist(); renderAll();
-        }
-      }
+      if (currentAssignment) openGradeDialog(currentAssignment);
     } else if (btn.classList.contains('delete-btn')) {
       showConfirm('Are you sure you want to delete this assignment?').then(function (confirmed) {
         if (confirmed) {
@@ -741,6 +731,77 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     });
   }
 
+  var gradeDialogId = null;
+  var GRADE_EMOJIS = { A: '🎉', B: '👍', C: '😐', D: '😬', F: '😢' };
+
+  function openGradeDialog(assignment) {
+    gradeDialogId = assignment.id;
+    var titleEl = document.getElementById('grade-dialog-title');
+    var assignEl = document.getElementById('grade-dialog-assignment');
+    var inputEl = document.getElementById('grade-input');
+    var emojiEl = document.getElementById('grade-emoji');
+    var letterEl = document.getElementById('grade-live-letter');
+
+    titleEl.textContent = typeof assignment.grade === 'number' ? 'Update Grade' : 'Enter Grade';
+    assignEl.textContent = assignment.title + ' — ' + assignment.className;
+    inputEl.value = typeof assignment.grade === 'number' ? assignment.grade : '';
+    updateGradePreview();
+
+    // Clear active picks
+    var picks = document.querySelectorAll('.grade-pick');
+    for (var i = 0; i < picks.length; i++) picks[i].classList.remove('active');
+
+    // Highlight matching pick if grade matches
+    if (typeof assignment.grade === 'number') {
+      var letter = DueIt.getLetterGrade(assignment.grade);
+      highlightGradePick(letter);
+    }
+
+    document.getElementById('grade-dialog').showModal();
+    inputEl.focus();
+  }
+
+  function highlightGradePick(letter) {
+    var picks = document.querySelectorAll('.grade-pick');
+    for (var i = 0; i < picks.length; i++) {
+      picks[i].classList.toggle('active', picks[i].textContent === letter);
+    }
+  }
+
+  function updateGradePreview() {
+    var inputEl = document.getElementById('grade-input');
+    var emojiEl = document.getElementById('grade-emoji');
+    var letterEl = document.getElementById('grade-live-letter');
+    var val = parseInt(inputEl.value, 10);
+    if (isNaN(val) || val < 0 || val > 100) {
+      emojiEl.textContent = '📊';
+      letterEl.textContent = '';
+      letterEl.style.color = '';
+      return;
+    }
+    var letter = DueIt.getLetterGrade(val);
+    var color = DueIt.getGradeColor(val);
+    emojiEl.textContent = GRADE_EMOJIS[letter] || '📊';
+    letterEl.textContent = letter;
+    letterEl.style.color = color;
+    highlightGradePick(letter);
+  }
+
+  function saveGrade() {
+    var inputEl = document.getElementById('grade-input');
+    var val = inputEl.value.trim();
+    if (!val) { document.getElementById('grade-dialog').close(); return; }
+    var result = DueIt.setGrade(state.assignments, gradeDialogId, val);
+    if (result.error) {
+      inputEl.style.outline = '2px solid var(--clr-danger)';
+      setTimeout(function () { inputEl.style.outline = ''; }, 1000);
+      return;
+    }
+    state.assignments = result.assignments;
+    persist(); renderAll();
+    document.getElementById('grade-dialog').close();
+  }
+
   function buildStudentHelp() {
     return '<h3>👋 Welcome to DueIt!</h3>' +
       '<p>DueIt helps you keep track of all your homework, tests, readings, and projects in one place. Here\'s how to get started:</p>' +
@@ -913,6 +974,22 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     document.getElementById('help-btn').addEventListener('click', handleHelp);
     document.getElementById('help-close-btn').addEventListener('click', function () {
       document.getElementById('help-dialog').close();
+    });
+
+    // Grade dialog
+    document.getElementById('grade-save-btn').addEventListener('click', saveGrade);
+    document.getElementById('grade-cancel-btn').addEventListener('click', function () {
+      document.getElementById('grade-dialog').close();
+    });
+    document.getElementById('grade-input').addEventListener('input', updateGradePreview);
+    document.getElementById('grade-input').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') saveGrade();
+    });
+    document.querySelector('.grade-quick-picks').addEventListener('click', function (e) {
+      var pick = e.target.closest('.grade-pick');
+      if (!pick) return;
+      document.getElementById('grade-input').value = pick.dataset.score;
+      updateGradePreview();
     });
 
     document.getElementById('mode-toggle-btn').addEventListener('click', function () {
