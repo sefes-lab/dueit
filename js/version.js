@@ -1,9 +1,15 @@
 var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {};
 (typeof globalThis !== 'undefined' ? globalThis : window).DueIt = DueIt;
 
-DueIt.APP_VERSION = '0.63';
+DueIt.APP_VERSION = '0.64';
 
 DueIt.VERSION_HISTORY = [
+  {
+    version: '0.64',
+    date: '2026-04-30',
+    description:
+      'New Semester: archive old assignments by date, XP rolls over across semesters, streaks reset, semester summary with stats and badges; semester count tracked in preferences; celebratory toast on completion; works in both Student and Parent modes',
+  },
   {
     version: '0.63',
     date: '2026-04-30',

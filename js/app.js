@@ -46,7 +46,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
       persist();
     }
     // Initialize level tracking so page load doesn't trigger level-up toast
-    lastLevel = DueIt.computeLevel(DueIt.computeXP(state.assignments)).level;
+    lastLevel = DueIt.computeLevel(DueIt.computeXP(state.assignments, state.preferences.rolloverXP)).level;
   }
 
   function persist() {
@@ -220,7 +220,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
   function renderXPBar() {
     var el = document.getElementById('xp-bar-container');
     if (!el) return;
-    var xp = DueIt.computeXP(state.assignments);
+    var xp = DueIt.computeXP(state.assignments, state.preferences.rolloverXP);
     var info = DueIt.computeLevel(xp);
 
     // Detect level-up
@@ -808,6 +808,151 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     document.getElementById('grade-dialog').close();
   }
 
+  /* ===== New Semester ===== */
+
+  function openSemesterDialog() {
+    var dateEl = document.getElementById('semester-date');
+    dateEl.value = new Date().toISOString().slice(0, 10);
+    updateSemesterPreview();
+    document.getElementById('semester-dialog').showModal();
+  }
+
+  function updateSemesterPreview() {
+    var dateEl = document.getElementById('semester-date');
+    var previewEl = document.getElementById('semester-preview');
+    var startBtn = document.getElementById('semester-start-btn');
+    var cutoff = dateEl.value;
+    if (!cutoff) {
+      previewEl.textContent = 'Pick a date to see what will be archived.';
+      startBtn.disabled = true;
+      return;
+    }
+    var archiveCount = state.assignments.filter(function (a) {
+      return a.dueDate < cutoff;
+    }).length;
+    var keepCount = state.assignments.length - archiveCount;
+    if (archiveCount === 0) {
+      previewEl.textContent = 'No assignments to archive before ' + cutoff + '. All ' + keepCount + ' assignments will be kept.';
+      startBtn.disabled = true;
+    } else {
+      previewEl.innerHTML = '<b>' + archiveCount + '</b> assignment' + (archiveCount !== 1 ? 's' : '') +
+        ' before ' + cutoff + ' will be archived.<br>' +
+        '<b>' + keepCount + '</b> assignment' + (keepCount !== 1 ? 's' : '') + ' will be kept.' +
+        '<br>Your XP carries over!';
+      startBtn.disabled = false;
+    }
+  }
+
+  function buildSemesterSummaryHtml(archived) {
+    var isParent = state.preferences.mode === 'parent';
+    var completed = archived.filter(function (a) { return a.isComplete || a.isStudied; }).length;
+    var turnedIn = archived.filter(function (a) { return a.isTurnedIn; }).length;
+    var graded = archived.filter(function (a) { return typeof a.grade === 'number'; });
+    var avgGrade = graded.length > 0
+      ? Math.round(graded.reduce(function (s, a) { return s + a.grade; }, 0) / graded.length)
+      : null;
+    var xp = DueIt.computeXP(archived);
+    var lvl = DueIt.computeLevel(DueIt.computeXP(state.assignments, state.preferences.rolloverXP));
+    var badges = DueIt.computeBadges(archived);
+    var unlocked = badges.filter(function (b) { return b.unlocked; });
+
+    var heading = isParent ? '📋 Semester Summary' : '🎉 Semester Complete!';
+    var subtext = isParent
+      ? 'Archiving ' + archived.length + ' assignments.'
+      : 'Great work this semester! Here\'s what you accomplished:';
+
+    var html = '<h2>' + heading + '</h2>' +
+      '<p style="color:var(--clr-muted);margin-bottom:0.75rem">' + subtext + '</p>' +
+      '<div class="semester-stats">' +
+        '<div class="semester-stat"><span class="semester-stat-value">' + archived.length + '</span><span class="semester-stat-label">Archived</span></div>' +
+        '<div class="semester-stat"><span class="semester-stat-value">' + completed + '</span><span class="semester-stat-label">Completed</span></div>' +
+        '<div class="semester-stat"><span class="semester-stat-value">' + turnedIn + '</span><span class="semester-stat-label">Turned In</span></div>' +
+        '<div class="semester-stat"><span class="semester-stat-value">' + graded.length + '</span><span class="semester-stat-label">Graded</span></div>' +
+      '</div>';
+
+    if (avgGrade !== null) {
+      html += '<p style="font-size:0.9rem;margin:0.5rem 0">Average grade: <b>' + avgGrade + ' ' + DueIt.getLetterGrade(avgGrade) + '</b></p>';
+    }
+
+    if (!isParent) {
+      html += '<p style="font-size:0.9rem;margin:0.5rem 0">⭐ ' + xp + ' XP earned this semester — rolling over!</p>';
+      html += '<p style="font-size:0.9rem">You\'re Level ' + lvl.level + ' — ' + _esc(lvl.title) + '</p>';
+    }
+
+    if (unlocked.length > 0) {
+      html += '<div class="semester-badges">🏆 ' + unlocked.map(function (b) { return b.emoji; }).join(' ') + '</div>';
+    }
+
+    html += '<div class="semester-summary-actions">' +
+      '<button type="button" class="btn btn-primary" id="semester-confirm-btn">✅ Confirm</button>' +
+      '<button type="button" class="btn btn-secondary" id="semester-back-btn">Go Back</button>' +
+    '</div>';
+
+    return html;
+  }
+
+  var semesterArchived = [];
+
+  function handleSemesterStart() {
+    var cutoff = document.getElementById('semester-date').value;
+    semesterArchived = state.assignments.filter(function (a) { return a.dueDate < cutoff; });
+    if (semesterArchived.length === 0) return;
+
+    var contentEl = document.getElementById('semester-summary-content');
+    contentEl.innerHTML = buildSemesterSummaryHtml(semesterArchived);
+
+    // Wire up summary buttons
+    document.getElementById('semester-confirm-btn').addEventListener('click', function () {
+      executeSemesterReset(cutoff);
+    });
+    document.getElementById('semester-back-btn').addEventListener('click', function () {
+      document.getElementById('semester-summary-dialog').close();
+    });
+
+    document.getElementById('semester-dialog').close();
+    document.getElementById('semester-summary-dialog').showModal();
+  }
+
+  function executeSemesterReset(cutoff) {
+    // Calculate XP from ALL current assignments before removing any
+    var totalXP = DueIt.computeXP(state.assignments, state.preferences.rolloverXP);
+
+    // Remove archived assignments
+    state.assignments = state.assignments.filter(function (a) { return a.dueDate >= cutoff; });
+
+    // Store rollover XP (total XP minus what remaining assignments contribute)
+    var remainingXP = DueIt.computeXP(state.assignments);
+    state.preferences.rolloverXP = totalXP - remainingXP;
+
+    // Increment semester count
+    state.preferences.semesterCount = (state.preferences.semesterCount || 0) + 1;
+
+    persist();
+    renderAll();
+
+    document.getElementById('semester-summary-dialog').close();
+    document.getElementById('settings-dialog').close();
+
+    // Show celebratory message
+    var isParent = state.preferences.mode === 'parent';
+    var msg = isParent
+      ? 'New semester started. ' + semesterArchived.length + ' assignments archived.'
+      : '🎉 New semester! You\'re starting with ' + totalXP + ' XP at Level ' + DueIt.computeLevel(totalXP).level + '. Let\'s go!';
+    var toast = document.createElement('div');
+    toast.className = 'level-up-toast';
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    if (!isParent) spawnConfetti();
+    setTimeout(function () {
+      toast.classList.add('hiding');
+      setTimeout(function () { toast.remove(); }, 500);
+    }, 3000);
+  }
+
+  function handleSemesterExport() {
+    handleExport();
+  }
+
   function buildStudentHelp() {
     return '<h3>👋 Welcome to DueIt!</h3>' +
       '<p>DueIt helps you keep track of all your homework, tests, readings, and projects in one place. Here\'s how to get started:</p>' +
@@ -996,6 +1141,18 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
       if (!pick) return;
       document.getElementById('grade-input').value = pick.dataset.score;
       updateGradePreview();
+    });
+
+    // New Semester
+    document.getElementById('new-semester-btn').addEventListener('click', openSemesterDialog);
+    document.getElementById('semester-date').addEventListener('change', updateSemesterPreview);
+    document.getElementById('semester-start-btn').addEventListener('click', handleSemesterStart);
+    document.getElementById('semester-export-btn').addEventListener('click', handleSemesterExport);
+    document.getElementById('semester-cancel-btn').addEventListener('click', function () {
+      document.getElementById('semester-dialog').close();
+    });
+    document.getElementById('semester-close-btn').addEventListener('click', function () {
+      document.getElementById('semester-dialog').close();
     });
 
     document.getElementById('mode-toggle-btn').addEventListener('click', function () {

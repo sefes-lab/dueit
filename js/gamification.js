@@ -43,8 +43,8 @@ var LEVEL_TITLES = [
   'Legend',           // 10
 ];
 
-DueIt.computeXP = function computeXP(assignments) {
-  var xp = 0;
+DueIt.computeXP = function computeXP(assignments, rolloverXP) {
+  var xp = rolloverXP || 0;
   assignments.forEach(function (a) {
     if (a.isComplete) xp += XP_VALUES.COMPLETE;
     if (a.isTurnedIn) {
@@ -290,7 +290,7 @@ DueIt.buildReportData = function buildReportData(assignments, preferences, strea
     catch (e) { return iso || ''; }
   }
 
-  var xp = DueIt.computeXP(assignments);
+  var xp = DueIt.computeXP(assignments, preferences.rolloverXP);
   var lvl = DueIt.computeLevel(xp);
   var total = assignments.length;
   var completed = assignments.filter(function (a) { return a.isComplete || a.isStudied; }).length;

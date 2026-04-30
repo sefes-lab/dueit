@@ -1,5 +1,17 @@
 # DueIt — Version History
 
+## v0.64 — 2026-04-30
+
+- New Semester feature: archive old assignments by selecting a start date
+- Semester dialog with date picker, live preview of what will be archived vs kept
+- Semester summary shows stats: archived count, completed, turned in, graded, average grade, XP, badges
+- XP rolls over across semesters (stored as `rolloverXP` in preferences)
+- Streaks reset on new semester
+- Semester count tracked in preferences
+- Export option before archiving to save a complete record
+- Celebratory toast and confetti on completion (neutral message in Parent mode)
+- Works in both Student and Parent modes
+
 ## v0.63 — 2026-04-30
 
 - Tiered badge system: 13 badges now have 4 levels each (★ bronze, ★★ silver, ★★★ gold, ★★★★ diamond)

@@ -457,12 +457,12 @@ input:focus, textarea:focus, select:focus {
 .assignment-actions { display: flex; gap: 0.35rem; margin-top: 0.5rem; flex-wrap: wrap; }
 
 /* ===== Confirmation Dialog ===== */
-dialog:not(.settings-dialog):not(.share-dialog):not(.help-dialog):not(.grade-dialog) {
+dialog:not(.settings-dialog):not(.share-dialog):not(.help-dialog):not(.grade-dialog):not(.semester-dialog) {
   border: none; border-radius: var(--radius); padding: 1.5rem;
   box-shadow: 0 4px 24px rgba(0,0,0,0.15); max-width: 400px; width: 90%;
   background: var(--clr-surface); color: var(--clr-text);
 }
-dialog:not(.settings-dialog):not(.share-dialog):not(.help-dialog):not(.grade-dialog)::backdrop { background: rgba(0,0,0,0.4); }
+dialog:not(.settings-dialog):not(.share-dialog):not(.help-dialog):not(.grade-dialog):not(.semester-dialog)::backdrop { background: rgba(0,0,0,0.4); }
 .dialog-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem; }
 
 /* ===== Storage Warning ===== */
@@ -715,3 +715,45 @@ body.parent-mode .progress-summary { display: flex; }
 }
 .grade-dialog-actions { display: flex; gap: 0.5rem; justify-content: center; }
 .grade-dialog-actions .btn { min-width: 100px; }
+
+/* ===== Semester Dialog ===== */
+.semester-dialog {
+  border: none; border-radius: var(--radius); padding: 0;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+  max-width: 440px; width: 92%;
+  background: var(--clr-surface); color: var(--clr-text);
+  max-height: 90vh;
+}
+.semester-dialog::backdrop { background: rgba(0,0,0,0.5); }
+.semester-body { padding: 1.25rem; overflow-y: auto; max-height: calc(90vh - 60px); }
+.semester-preview {
+  font-size: 0.9rem; margin: 0.75rem 0; padding: 0.6rem 0.75rem;
+  background: var(--clr-bg); border: 1px solid var(--clr-border);
+  border-radius: var(--radius); line-height: 1.5;
+}
+.semester-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.semester-actions .btn { flex: 1; min-width: 0; }
+.semester-summary-inner {
+  padding: 1.5rem; text-align: center; overflow-y: auto; max-height: calc(90vh - 2rem);
+}
+.semester-summary-inner h2 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+.semester-summary-inner .semester-stats {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;
+  margin: 0.75rem 0; text-align: center;
+}
+.semester-summary-inner .semester-stat {
+  padding: 0.5rem; background: var(--clr-bg); border: 1px solid var(--clr-border);
+  border-radius: var(--radius);
+}
+.semester-summary-inner .semester-stat-value {
+  font-size: 1.3rem; font-weight: 700; color: var(--clr-primary); display: block;
+}
+.semester-summary-inner .semester-stat-label {
+  font-size: 0.7rem; color: var(--clr-muted); text-transform: uppercase;
+}
+.semester-summary-inner .semester-badges {
+  font-size: 0.85rem; margin: 0.5rem 0; color: var(--clr-muted);
+}
+.semester-summary-inner .semester-summary-actions {
+  display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem;
+}
