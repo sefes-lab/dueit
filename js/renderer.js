@@ -63,7 +63,12 @@ DueIt.renderTracker = function renderTracker(assignments, now, getClassColor) {
       actionButtons =
         '<button class="btn btn-sm btn-secondary toggle-studied-btn" data-id="' + a.id + '">' +
           (a.isStudied ? '↩ Not Studied' : '📖 Studied') +
-        '</button>';
+        '</button>' +
+        (a.isStudied
+          ? '<button class="btn btn-sm btn-secondary grade-btn" data-id="' + a.id + '">' +
+              (typeof a.grade === 'number' ? '✏️ ' + a.grade : '📊 Grade') +
+            '</button>'
+          : '');
     } else {
       actionButtons =
         '<button class="btn btn-sm btn-secondary toggle-complete-btn" data-id="' + a.id + '">' +
@@ -73,7 +78,20 @@ DueIt.renderTracker = function renderTracker(assignments, now, getClassColor) {
           ? '<button class="btn btn-sm btn-secondary toggle-turned-in-btn" data-id="' + a.id + '">' +
               (a.isTurnedIn ? '↩ Undo' : '🫴 Turn In') +
             '</button>'
+          : '') +
+        (a.isTurnedIn
+          ? '<button class="btn btn-sm btn-secondary grade-btn" data-id="' + a.id + '">' +
+              (typeof a.grade === 'number' ? '✏️ ' + a.grade : '📊 Grade') +
+            '</button>'
           : '');
+    }
+
+    // Grade badge
+    var gradeBadge = '';
+    if (typeof a.grade === 'number') {
+      var letter = DueIt.getLetterGrade(a.grade);
+      var gColor = DueIt.getGradeColor(a.grade);
+      gradeBadge = '<span class="grade-badge" style="background:' + gColor + '">' + a.grade + ' ' + letter + '</span>';
     }
 
     return '<div class="' + classes.join(' ') + '" data-id="' + a.id + '" style="border-left:4px solid ' + dotColor + '">' +
@@ -81,6 +99,7 @@ DueIt.renderTracker = function renderTracker(assignments, now, getClassColor) {
         typeIcon + ' ' + _escapeHtml(a.title) +
         (a.isTurnedIn ? '<span class="turned-in-badge">Turned In</span>' : '') +
         (a.isStudied ? '<span class="turned-in-badge" style="background:#f39c12">Studied</span>' : '') +
+        gradeBadge +
       '</div>' +
       '<div class="assignment-meta">' +
         '<span class="class-dot" style="background:' + dotColor + '"></span>' +

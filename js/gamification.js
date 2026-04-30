@@ -9,6 +9,11 @@ var XP_VALUES = {
   STUDIED: 15,
   ON_TIME: 10,       // bonus for turning in before due date
   STREAK_BONUS: 5,   // per streak day beyond 1
+  GRADE_BASE: 5,     // recording any grade
+  GRADE_C: 5,        // bonus for C (70-79)
+  GRADE_B: 10,       // bonus for B (80-89)
+  GRADE_A: 15,       // bonus for A (90-99)
+  GRADE_PERFECT: 25, // bonus for 100
 };
 
 // Level thresholds: level N requires LEVELS[N] total XP
@@ -52,6 +57,20 @@ DueIt.computeXP = function computeXP(assignments) {
       }
     }
     if (a.isStudied) xp += XP_VALUES.STUDIED;
+    // Grade XP
+    if (typeof a.grade === 'number') {
+      var gradeXP = XP_VALUES.GRADE_BASE;
+      if (a.grade === 100) gradeXP += XP_VALUES.GRADE_PERFECT;
+      else if (a.grade >= 90) gradeXP += XP_VALUES.GRADE_A;
+      else if (a.grade >= 80) gradeXP += XP_VALUES.GRADE_B;
+      else if (a.grade >= 70) gradeXP += XP_VALUES.GRADE_C;
+      // 1.5x multiplier for tests and projects
+      var type = a.type || 'homework';
+      if (type === 'test' || type === 'project') {
+        gradeXP = Math.round(gradeXP * 1.5);
+      }
+      xp += gradeXP;
+    }
   });
   return xp;
 };
@@ -108,6 +127,39 @@ var BADGES = [
       return d >= startOfWeek && d < endOfWeek;
     });
     return dueThisWeek.length > 0 && dueThisWeek.every(function(x){ return x.isComplete || x.isStudied; });
+  }},
+  // Grade badges
+  { id: 'first_grade',    emoji: '📊', name: 'First Grade',      desc: 'Record your first grade',             check: function (a) { return a.some(function(x){ return typeof x.grade === 'number'; }); } },
+  { id: 'perfect_score',  emoji: '🏆', name: 'Perfect Score',    desc: 'Get a 100 on any assignment',         check: function (a) { return a.some(function(x){ return x.grade === 100; }); } },
+  { id: 'honor_roll',     emoji: '🎖️', name: 'Honor Roll',       desc: 'Get 5 or more grades of 90+',        check: function (a) { return a.filter(function(x){ return typeof x.grade === 'number' && x.grade >= 90; }).length >= 5; } },
+  { id: 'grade_tracker',  emoji: '📈', name: 'Grade Tracker',    desc: 'Record grades on 10 assignments',     check: function (a) { return a.filter(function(x){ return typeof x.grade === 'number'; }).length >= 10; } },
+  { id: 'straight_as',    emoji: '🌟', name: 'Straight A\'s',    desc: 'Get an A on 5 graded assignments in a row', check: function (a) {
+    var graded = a.filter(function(x){ return typeof x.grade === 'number' && x.gradedAt; });
+    graded.sort(function(x,y){ return new Date(x.gradedAt).getTime() - new Date(y.gradedAt).getTime(); });
+    var streak = 0;
+    for (var i = 0; i < graded.length; i++) {
+      if (graded[i].grade >= 90) { streak++; if (streak >= 5) return true; }
+      else { streak = 0; }
+    }
+    return false;
+  }},
+  { id: 'test_ace',       emoji: '🧠', name: 'Test Ace',         desc: 'Get 90+ on 3 tests',                 check: function (a) { return a.filter(function(x){ return x.type === 'test' && typeof x.grade === 'number' && x.grade >= 90; }).length >= 3; } },
+  { id: 'project_pro',    emoji: '🏗️', name: 'Project Pro',      desc: 'Get 90+ on 2 projects',              check: function (a) { return a.filter(function(x){ return x.type === 'project' && typeof x.grade === 'number' && x.grade >= 90; }).length >= 2; } },
+  { id: 'bookworm_bonus', emoji: '📚', name: 'Bookworm Bonus',   desc: 'Get 90+ on 3 readings',              check: function (a) { return a.filter(function(x){ return x.type === 'reading' && typeof x.grade === 'number' && x.grade >= 90; }).length >= 3; } },
+  { id: 'scholar_types',  emoji: '🎯', name: 'Well Rounded Scholar', desc: 'Record grades on all 4 assignment types', check: function (a) {
+    var types = {};
+    a.forEach(function(x){ if (typeof x.grade === 'number') types[x.type || 'homework'] = true; });
+    return types.homework && types.test && types.reading && types.project;
+  }},
+  { id: 'grade_streak',   emoji: '🔥', name: 'Grade Streak',     desc: 'Get 3 grades of 80+ in a row',       check: function (a) {
+    var graded = a.filter(function(x){ return typeof x.grade === 'number' && x.gradedAt; });
+    graded.sort(function(x,y){ return new Date(x.gradedAt).getTime() - new Date(y.gradedAt).getTime(); });
+    var streak = 0;
+    for (var i = 0; i < graded.length; i++) {
+      if (graded[i].grade >= 80) { streak++; if (streak >= 3) return true; }
+      else { streak = 0; }
+    }
+    return false;
   }},
 ];
 
@@ -188,6 +240,10 @@ DueIt.buildReportData = function buildReportData(assignments, preferences, strea
       doneDate = fmtDate(a.completedAt);
     }
     var turnedInDate = (!isTest && a.turnedInAt) ? fmtDate(a.turnedInAt) : '';
+    var gradeStr = '';
+    if (typeof a.grade === 'number') {
+      gradeStr = a.grade + ' ' + DueIt.getLetterGrade(a.grade);
+    }
     return {
       icon: icon,
       className: a.className,
@@ -198,6 +254,7 @@ DueIt.buildReportData = function buildReportData(assignments, preferences, strea
       doneDate: doneDate,
       turnedInDate: turnedInDate,
       isTest: isTest,
+      grade: gradeStr,
     };
   });
 
@@ -251,6 +308,7 @@ DueIt.buildProgressReport = function buildProgressReport(assignments, preference
       var detail = '   Due: ' + r.dueDate + ' (' + r.countdown + ') | ' + statusIcon + ' ' + r.status;
       if (r.doneDate) detail += ' | Done: ' + r.doneDate;
       if (r.turnedInDate) detail += ' | Turned In: ' + r.turnedInDate;
+      if (r.grade) detail += ' | Grade: ' + r.grade;
       lines.push(detail);
     });
     lines.push('');

@@ -1,5 +1,24 @@
 # DueIt — Version History
 
+## v0.62 — 2026-04-30
+
+- Grade tracking: record grades (0–100) on turned-in assignments and studied tests
+- Color-coded grade badges on assignment cards: A (green), B (blue), C (orange), D (orange), F (red)
+- Grade XP system: +5 base XP for any grade, tiered bonuses (C +5, B +10, A +15, 100 +25)
+- 1.5x XP multiplier for test and project grades
+- 10 new achievement badges:
+  - 📊 First Grade — Record your first grade
+  - 🏆 Perfect Score — Get a 100
+  - 🎖️ Honor Roll — Get 5+ grades of 90+
+  - 📈 Grade Tracker — Record 10 grades
+  - 🌟 Straight A's — 5 consecutive A grades
+  - 🧠 Test Ace — 90+ on 3 tests
+  - 🏗️ Project Pro — 90+ on 2 projects
+  - 📚 Bookworm Bonus — 90+ on 3 readings
+  - 🎯 Well Rounded Scholar — Grades on all 4 types
+  - 🔥 Grade Streak — 3 grades of 80+ in a row
+- Grades included in print view and share progress reports
+
 ## v0.61 — 2026-04-27
 
 - In-app help: ❓ button in header opens a context-sensitive help guide

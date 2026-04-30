@@ -407,6 +407,19 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
         document.getElementById('assignmentType').value = assignment.type || 'homework';
         document.getElementById('assignment-form-section').scrollIntoView({ behavior: 'smooth' });
       }
+    } else if (btn.classList.contains('grade-btn')) {
+      var currentAssignment = state.assignments.filter(function (a) { return a.id === id; })[0];
+      var currentGrade = (currentAssignment && typeof currentAssignment.grade === 'number') ? currentAssignment.grade : '';
+      var input = prompt('Enter grade (0–100):', currentGrade);
+      if (input !== null && input.trim() !== '') {
+        var result = DueIt.setGrade(state.assignments, id, input.trim());
+        if (result.error) {
+          alert(result.error);
+        } else {
+          state.assignments = result.assignments;
+          persist(); renderAll();
+        }
+      }
     } else if (btn.classList.contains('delete-btn')) {
       showConfirm('Are you sure you want to delete this assignment?').then(function (confirmed) {
         if (confirmed) {
@@ -482,6 +495,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
           '<td>' + r.dueDate + '</td>' +
           '<td>' + r.countdown + '</td>' +
           '<td>' + r.status + '</td>' +
+          '<td>' + (r.grade || '') + '</td>' +
           '<td>' + r.doneDate + '</td>' +
           '<td>' + (r.isTest ? '' : r.turnedInDate) + '</td>' +
         '</tr>';
@@ -504,8 +518,8 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
         (subtitle ? '<p class="subtitle">' + _esc(subtitle) + '</p>' : '') +
         '<p class="date">Printed ' + d.date.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) + '</p>' +
         summaryHtml +
-        '<table><thead><tr><th>Type</th><th>Class</th><th>Assignment</th><th>Due Date</th><th>Countdown</th><th>Status</th><th>Done</th><th>Turned In</th></tr></thead>' +
-        '<tbody>' + (rows || '<tr><td colspan="8" style="text-align:center;padding:1rem">No assignments</td></tr>') + '</tbody></table>' +
+        '<table><thead><tr><th>Type</th><th>Class</th><th>Assignment</th><th>Due Date</th><th>Countdown</th><th>Status</th><th>Grade</th><th>Done</th><th>Turned In</th></tr></thead>' +
+        '<tbody>' + (rows || '<tr><td colspan="9" style="text-align:center;padding:1rem">No assignments</td></tr>') + '</tbody></table>' +
         '</body></html>';
     }
 
@@ -743,6 +757,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
         '<li><b>👍 Done</b> — Mark it when you finish the work</li>' +
         '<li><b>🫴 Turn In</b> — Mark it after you hand it in (shows up after Done)</li>' +
         '<li><b>📖 Studied</b> — For tests and quizzes, mark when you\'ve studied</li>' +
+        '<li><b>📊 Grade</b> — After turning in or studying, record your grade (0–100)</li>' +
         '<li><b>✏️ Edit</b> — Fix a mistake or change the due date</li>' +
         '<li><b>🗑 Delete</b> — Remove an assignment you don\'t need</li>' +
       '</ul>' +
@@ -754,6 +769,8 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
         '<li>Turn it in: <b>+20 XP</b></li>' +
         '<li>Turn it in on time: <b>+10 bonus XP</b></li>' +
         '<li>Study for a test: <b>+15 XP</b></li>' +
+        '<li>Record a grade: <b>+5 XP</b> (plus bonuses for B, A, and 100!)</li>' +
+        '<li>Tests and projects earn <b>1.5x</b> grade XP</li>' +
       '</ul>' +
       '<p>Level up from Freshman all the way to Legend! 🎉</p>' +
 

@@ -1,9 +1,15 @@
 var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {};
 (typeof globalThis !== 'undefined' ? globalThis : window).DueIt = DueIt;
 
-DueIt.APP_VERSION = '0.61';
+DueIt.APP_VERSION = '0.62';
 
 DueIt.VERSION_HISTORY = [
+  {
+    version: '0.62',
+    date: '2026-04-30',
+    description:
+      'Grade tracking: record grades (0–100) on turned-in assignments and studied tests; color-coded grade badges on cards (A green, B blue, C orange, D orange, F red); grade XP with tier bonuses and 1.5x multiplier for tests/projects; 10 new achievement badges (First Grade, Perfect Score, Honor Roll, Grade Tracker, Straight A\'s, Test Ace, Project Pro, Bookworm Bonus, Well Rounded Scholar, Grade Streak); grades in print and share reports',
+  },
   {
     version: '0.61',
     date: '2026-04-27',
