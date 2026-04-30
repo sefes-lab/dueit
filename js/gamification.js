@@ -278,7 +278,7 @@ DueIt.computeWeeklyStats = function computeWeeklyStats(assignments) {
 
 /* ===== Shared Report Data (used by both text share and HTML print) ===== */
 
-DueIt.buildReportData = function buildReportData(assignments, preferences, streak) {
+DueIt.buildReportData = function buildReportData(assignments, preferences, streak, rolloverXP) {
   var name = (preferences.studentName || '').trim();
   var grade = (preferences.studentGrade || '').trim();
   var first = name.split(' ')[0] || 'Student';
@@ -290,7 +290,7 @@ DueIt.buildReportData = function buildReportData(assignments, preferences, strea
     catch (e) { return iso || ''; }
   }
 
-  var xp = DueIt.computeXP(assignments, preferences.rolloverXP);
+  var xp = DueIt.computeXP(assignments, rolloverXP);
   var lvl = DueIt.computeLevel(xp);
   var total = assignments.length;
   var completed = assignments.filter(function (a) { return a.isComplete || a.isStudied; }).length;
@@ -354,8 +354,8 @@ DueIt.buildReportData = function buildReportData(assignments, preferences, strea
 
 /* ===== Text Progress Report (for sharing) ===== */
 
-DueIt.buildProgressReport = function buildProgressReport(assignments, preferences, streak) {
-  var d = DueIt.buildReportData(assignments, preferences, streak);
+DueIt.buildProgressReport = function buildProgressReport(assignments, preferences, streak, rolloverXP) {
+  var d = DueIt.buildReportData(assignments, preferences, streak, rolloverXP);
   var dateStr = d.date.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 
   var lines = [];

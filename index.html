@@ -164,7 +164,10 @@
       <section class="settings-section">
         <h3>🎓 New Semester</h3>
         <p class="field-hint" style="margin-bottom:0.5rem">Archive old assignments and start fresh. Your XP carries over!</p>
-        <button type="button" class="btn btn-primary" id="new-semester-btn">🎓 New Semester</button>
+        <div class="import-export-actions">
+          <button type="button" class="btn btn-primary" id="new-semester-btn">🎓 New Semester</button>
+          <button type="button" class="btn btn-secondary" id="year-review-btn">📊 Year in Review</button>
+        </div>
       </section>
     </div>
   </dialog>
@@ -232,6 +235,19 @@
     <div class="semester-summary-inner" id="semester-summary-content"></div>
   </dialog>
 
+  <!-- Year in Review Dialog -->
+  <dialog id="year-review-dialog" class="year-review-dialog">
+    <div class="dialog-header">
+      <h2 id="year-review-title">📊 Year in Review</h2>
+      <button type="button" class="icon-btn" id="year-review-close-btn" aria-label="Close">&times;</button>
+    </div>
+    <div class="year-review-body" id="year-review-body"></div>
+    <div class="year-review-footer">
+      <button type="button" class="btn btn-primary" id="year-review-print-btn">🖨️ Print</button>
+      <button type="button" class="btn btn-secondary" id="year-review-share-btn">⬆️ Share</button>
+    </div>
+  </dialog>
+
   <!-- Share Progress Dialog -->
   <dialog id="share-dialog" class="share-dialog">
     <div class="dialog-header">
@@ -287,7 +303,7 @@
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js?v=0.64').then(function (reg) {
+      navigator.serviceWorker.register('./sw.js?v=0.65').then(function (reg) {
         // Force check for updated SW on every page load
         reg.update();
       }).catch(function () {});

@@ -7,6 +7,7 @@ DueIt.STORAGE_KEYS = {
   ASSIGNMENTS: 'dueit_assignments',
   CLASSES: 'dueit_classes',
   PREFERENCES: 'dueit_preferences',
+  SEMESTER_HISTORY: 'dueit_semester_history',
 };
 
 /**

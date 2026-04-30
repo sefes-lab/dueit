@@ -457,12 +457,12 @@ input:focus, textarea:focus, select:focus {
 .assignment-actions { display: flex; gap: 0.35rem; margin-top: 0.5rem; flex-wrap: wrap; }
 
 /* ===== Confirmation Dialog ===== */
-dialog:not(.settings-dialog):not(.share-dialog):not(.help-dialog):not(.grade-dialog):not(.semester-dialog) {
+dialog:not(.settings-dialog):not(.share-dialog):not(.help-dialog):not(.grade-dialog):not(.semester-dialog):not(.year-review-dialog) {
   border: none; border-radius: var(--radius); padding: 1.5rem;
   box-shadow: 0 4px 24px rgba(0,0,0,0.15); max-width: 400px; width: 90%;
   background: var(--clr-surface); color: var(--clr-text);
 }
-dialog:not(.settings-dialog):not(.share-dialog):not(.help-dialog):not(.grade-dialog):not(.semester-dialog)::backdrop { background: rgba(0,0,0,0.4); }
+dialog:not(.settings-dialog):not(.share-dialog):not(.help-dialog):not(.grade-dialog):not(.semester-dialog):not(.year-review-dialog)::backdrop { background: rgba(0,0,0,0.4); }
 .dialog-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem; }
 
 /* ===== Storage Warning ===== */
@@ -756,4 +756,52 @@ body.parent-mode .progress-summary { display: flex; }
 }
 .semester-summary-inner .semester-summary-actions {
   display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem;
+}
+
+/* ===== Year in Review Dialog ===== */
+.year-review-dialog {
+  border: none; border-radius: var(--radius); padding: 0;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+  max-width: 500px; width: 92%;
+  background: var(--clr-surface); color: var(--clr-text);
+  max-height: 90vh;
+}
+.year-review-dialog::backdrop { background: rgba(0,0,0,0.5); }
+.year-review-body {
+  padding: 1.25rem; overflow-y: auto; max-height: calc(90vh - 120px);
+  font-size: 0.9rem; line-height: 1.6;
+}
+.year-review-body h3 { font-size: 1rem; margin: 1rem 0 0.4rem; color: var(--clr-primary); }
+.year-review-body h3:first-child { margin-top: 0; }
+.year-review-body .yr-big-number {
+  font-size: 2.5rem; font-weight: 700; color: var(--clr-primary);
+  display: block; text-align: center; margin: 0.25rem 0;
+}
+.year-review-body .yr-label {
+  font-size: 0.8rem; color: var(--clr-muted); text-align: center; display: block; margin-bottom: 0.75rem;
+}
+.year-review-body .yr-stats {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; margin: 0.75rem 0;
+}
+.year-review-body .yr-stat {
+  text-align: center; padding: 0.5rem; background: var(--clr-bg);
+  border: 1px solid var(--clr-border); border-radius: var(--radius);
+}
+.year-review-body .yr-stat-value {
+  font-size: 1.3rem; font-weight: 700; color: var(--clr-primary); display: block;
+}
+.year-review-body .yr-stat-label {
+  font-size: 0.65rem; color: var(--clr-muted); text-transform: uppercase;
+}
+.year-review-body .yr-fun-fact {
+  background: var(--clr-bg); border: 1px solid var(--clr-border);
+  border-radius: var(--radius); padding: 0.6rem 0.75rem;
+  margin: 0.5rem 0; font-size: 0.85rem; text-align: center;
+}
+.year-review-body .yr-badges {
+  text-align: center; font-size: 1.5rem; margin: 0.5rem 0; letter-spacing: 0.2em;
+}
+.year-review-footer {
+  display: flex; gap: 0.5rem; padding: 0.75rem 1.25rem;
+  border-top: 1px solid var(--clr-border); justify-content: center;
 }

@@ -1,5 +1,18 @@
 # DueIt — Version History
 
+## v0.65 — 2026-04-30
+
+- Year in Review: consolidated report across all semesters
+  - Total assignments, completion rate, grade average, XP journey
+  - Fun facts (busiest class, on-time count, type breakdown)
+  - Badges earned summary
+  - Printable and shareable (Web Share API or clipboard)
+  - Adapts to Student mode (celebratory) and Parent mode (informative)
+- Semester data moved from preferences to dedicated `dueit_semester_history` localStorage key
+  - Stores history array, rolloverXP, and semesterCount separately from user preferences
+  - Legacy data auto-migrated on load for existing users
+- "📊 Year in Review" button in Settings alongside New Semester
+
 ## v0.64 — 2026-04-30
 
 - New Semester feature: archive old assignments by selecting a start date

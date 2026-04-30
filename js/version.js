@@ -1,9 +1,15 @@
 var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {};
 (typeof globalThis !== 'undefined' ? globalThis : window).DueIt = DueIt;
 
-DueIt.APP_VERSION = '0.64';
+DueIt.APP_VERSION = '0.65';
 
 DueIt.VERSION_HISTORY = [
+  {
+    version: '0.65',
+    date: '2026-04-30',
+    description:
+      'Year in Review: consolidated report across all semesters with stats, grades, XP, badges, fun facts; printable and shareable; semester data moved to dedicated localStorage key (dueit_semester_history) with migration from preferences; legacy data auto-migrated on load',
+  },
   {
     version: '0.64',
     date: '2026-04-30',

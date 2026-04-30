@@ -12,7 +12,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     '🚀 Ready for liftoff! Add your first assignment.',
     '☀️ No homework? Must be a good day!',
   ];
-  var state = { assignments: [], classes: [], preferences: {} };
+  var state = { assignments: [], classes: [], preferences: {}, semesterData: {} };
   var storageAvailable = true;
   var confirmResolve = null;
   var calendarMode = false;
@@ -30,6 +30,17 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     state.assignments = DueIt.load(DueIt.STORAGE_KEYS.ASSIGNMENTS) || [];
     state.classes = DueIt.load(DueIt.STORAGE_KEYS.CLASSES);
     state.preferences = DueIt.load(DueIt.STORAGE_KEYS.PREFERENCES) || {};
+    state.semesterData = DueIt.load(DueIt.STORAGE_KEYS.SEMESTER_HISTORY) || { history: [], rolloverXP: 0, semesterCount: 0 };
+
+    // Migrate legacy semester data from preferences if present
+    if (state.preferences.semesterHistory || state.preferences.rolloverXP || state.preferences.semesterCount) {
+      if (state.preferences.semesterHistory) state.semesterData.history = state.preferences.semesterHistory;
+      if (state.preferences.rolloverXP) state.semesterData.rolloverXP = state.preferences.rolloverXP;
+      if (state.preferences.semesterCount) state.semesterData.semesterCount = state.preferences.semesterCount;
+      delete state.preferences.semesterHistory;
+      delete state.preferences.rolloverXP;
+      delete state.preferences.semesterCount;
+    }
 
     // Seed defaults on first run (no classes saved yet)
     var needsPersist = false;
@@ -46,7 +57,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
       persist();
     }
     // Initialize level tracking so page load doesn't trigger level-up toast
-    lastLevel = DueIt.computeLevel(DueIt.computeXP(state.assignments, state.preferences.rolloverXP)).level;
+    lastLevel = DueIt.computeLevel(DueIt.computeXP(state.assignments, state.semesterData.rolloverXP)).level;
   }
 
   function persist() {
@@ -54,6 +65,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     DueIt.save(DueIt.STORAGE_KEYS.ASSIGNMENTS, state.assignments);
     DueIt.save(DueIt.STORAGE_KEYS.CLASSES, state.classes);
     DueIt.save(DueIt.STORAGE_KEYS.PREFERENCES, state.preferences);
+    DueIt.save(DueIt.STORAGE_KEYS.SEMESTER_HISTORY, state.semesterData);
   }
 
   function renderAll() {
@@ -220,7 +232,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
   function renderXPBar() {
     var el = document.getElementById('xp-bar-container');
     if (!el) return;
-    var xp = DueIt.computeXP(state.assignments, state.preferences.rolloverXP);
+    var xp = DueIt.computeXP(state.assignments, state.semesterData.rolloverXP);
     var info = DueIt.computeLevel(xp);
 
     // Detect level-up
@@ -472,7 +484,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
 
   function buildPrintableHtml() {
       var streak = computeStreak(state.assignments);
-      var d = DueIt.buildReportData(state.assignments, state.preferences, streak);
+      var d = DueIt.buildReportData(state.assignments, state.preferences, streak, state.semesterData.rolloverXP);
       var heading = d.first ? d.first + "'s Assignments" : 'My Assignments';
       var subtitle = d.name && d.grade ? d.name + ' — Grade ' + d.grade : (d.name || '');
 
@@ -586,7 +598,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
 
   function handleShare() {
     var streak = computeStreak(state.assignments);
-    var report = DueIt.buildProgressReport(state.assignments, state.preferences, streak);
+    var report = DueIt.buildProgressReport(state.assignments, state.preferences, streak, state.semesterData.rolloverXP);
     var emailInput = document.getElementById('share-dialog-email');
     var preview = document.getElementById('share-preview');
     var feedback = document.getElementById('share-feedback');
@@ -622,7 +634,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     if (settingsEmail) settingsEmail.value = email;
 
     var streak = computeStreak(state.assignments);
-    var report = DueIt.buildProgressReport(state.assignments, state.preferences, streak);
+    var report = DueIt.buildProgressReport(state.assignments, state.preferences, streak, state.semesterData.rolloverXP);
     var name = (state.preferences.studentName || '').trim();
     var first = name.split(' ')[0] || 'Student';
     var subject = encodeURIComponent(first + "'s DueIt Progress Report");
@@ -633,7 +645,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     var mailto = 'mailto:' + encodeURIComponent(email) + '?subject=' + subject + '&body=' + body;
     if (mailto.length > 1900) {
       // Build a shorter version: just the summary section
-      var shortReport = DueIt.buildProgressReport(state.assignments, state.preferences, streak);
+      var shortReport = DueIt.buildProgressReport(state.assignments, state.preferences, streak, state.semesterData.rolloverXP);
       // Truncate to fit within limits
       var maxBodyLen = 1500;
       if (shortReport.length > maxBodyLen) {
@@ -852,7 +864,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
       ? Math.round(graded.reduce(function (s, a) { return s + a.grade; }, 0) / graded.length)
       : null;
     var xp = DueIt.computeXP(archived);
-    var lvl = DueIt.computeLevel(DueIt.computeXP(state.assignments, state.preferences.rolloverXP));
+    var lvl = DueIt.computeLevel(DueIt.computeXP(state.assignments, state.semesterData.rolloverXP));
     var badges = DueIt.computeBadges(archived);
     var unlocked = badges.filter(function (b) { return b.unlocked; });
 
@@ -915,17 +927,59 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
 
   function executeSemesterReset(cutoff) {
     // Calculate XP from ALL current assignments before removing any
-    var totalXP = DueIt.computeXP(state.assignments, state.preferences.rolloverXP);
+    var totalXP = DueIt.computeXP(state.assignments, state.semesterData.rolloverXP);
+
+    // Build semester snapshot from archived assignments
+    var archived = semesterArchived;
+    var completed = archived.filter(function (a) { return a.isComplete || a.isStudied; }).length;
+    var turnedIn = archived.filter(function (a) { return a.isTurnedIn; }).length;
+    var graded = archived.filter(function (a) { return typeof a.grade === 'number'; });
+    var avgGrade = graded.length > 0
+      ? Math.round(graded.reduce(function (s, a) { return s + a.grade; }, 0) / graded.length)
+      : null;
+    var onTime = archived.filter(function (a) {
+      if (!a.isTurnedIn || !a.turnedInAt || !a.dueDate) return false;
+      return new Date(a.turnedInAt) <= new Date(a.dueDate + 'T23:59:59');
+    }).length;
+    // Count by class
+    var classCounts = {};
+    archived.forEach(function (a) {
+      classCounts[a.className] = (classCounts[a.className] || 0) + 1;
+    });
+    // Count by type
+    var typeCounts = {};
+    archived.forEach(function (a) {
+      var t = a.type || 'homework';
+      typeCounts[t] = (typeCounts[t] || 0) + 1;
+    });
+    var xpEarned = DueIt.computeXP(archived);
+
+    var snapshot = {
+      date: new Date().toISOString(),
+      cutoff: cutoff,
+      total: archived.length,
+      completed: completed,
+      turnedIn: turnedIn,
+      onTime: onTime,
+      graded: graded.length,
+      avgGrade: avgGrade,
+      xpEarned: xpEarned,
+      classCounts: classCounts,
+      typeCounts: typeCounts,
+    };
+
+    // Save to semester history
+    state.semesterData.history.push(snapshot);
 
     // Remove archived assignments
     state.assignments = state.assignments.filter(function (a) { return a.dueDate >= cutoff; });
 
     // Store rollover XP (total XP minus what remaining assignments contribute)
     var remainingXP = DueIt.computeXP(state.assignments);
-    state.preferences.rolloverXP = totalXP - remainingXP;
+    state.semesterData.rolloverXP = totalXP - remainingXP;
 
     // Increment semester count
-    state.preferences.semesterCount = (state.preferences.semesterCount || 0) + 1;
+    state.semesterData.semesterCount = (state.semesterData.semesterCount || 0) + 1;
 
     persist();
     renderAll();
@@ -936,7 +990,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     // Show celebratory message
     var isParent = state.preferences.mode === 'parent';
     var msg = isParent
-      ? 'New semester started. ' + semesterArchived.length + ' assignments archived.'
+      ? 'New semester started. ' + archived.length + ' assignments archived.'
       : '🎉 New semester! You\'re starting with ' + totalXP + ' XP at Level ' + DueIt.computeLevel(totalXP).level + '. Let\'s go!';
     var toast = document.createElement('div');
     toast.className = 'level-up-toast';
@@ -951,6 +1005,232 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
 
   function handleSemesterExport() {
     handleExport();
+  }
+
+  /* ===== Year in Review ===== */
+
+  function buildYearReviewHtml() {
+    var isParent = state.preferences.mode === 'parent';
+    var history = state.semesterData.history || [];
+    var name = (state.preferences.studentName || '').trim();
+    var first = name.split(' ')[0] || 'Student';
+
+    // Aggregate stats from semester history + current assignments
+    var totalAssignments = 0, totalCompleted = 0, totalTurnedIn = 0, totalOnTime = 0;
+    var totalGraded = 0, gradeSum = 0, totalXP = 0;
+    var allClassCounts = {}, allTypeCounts = {};
+
+    history.forEach(function (s) {
+      totalAssignments += s.total || 0;
+      totalCompleted += s.completed || 0;
+      totalTurnedIn += s.turnedIn || 0;
+      totalOnTime += s.onTime || 0;
+      totalGraded += s.graded || 0;
+      if (s.avgGrade !== null && s.graded > 0) gradeSum += s.avgGrade * s.graded;
+      totalXP += s.xpEarned || 0;
+      if (s.classCounts) {
+        for (var c in s.classCounts) allClassCounts[c] = (allClassCounts[c] || 0) + s.classCounts[c];
+      }
+      if (s.typeCounts) {
+        for (var t in s.typeCounts) allTypeCounts[t] = (allTypeCounts[t] || 0) + s.typeCounts[t];
+      }
+    });
+
+    // Add current assignments
+    state.assignments.forEach(function (a) {
+      totalAssignments++;
+      if (a.isComplete || a.isStudied) totalCompleted++;
+      if (a.isTurnedIn) totalTurnedIn++;
+      if (a.isTurnedIn && a.turnedInAt && a.dueDate) {
+        if (new Date(a.turnedInAt) <= new Date(a.dueDate + 'T23:59:59')) totalOnTime++;
+      }
+      if (typeof a.grade === 'number') {
+        totalGraded++;
+        gradeSum += a.grade;
+      }
+      allClassCounts[a.className] = (allClassCounts[a.className] || 0) + 1;
+      var t = a.type || 'homework';
+      allTypeCounts[t] = (allTypeCounts[t] || 0) + 1;
+    });
+
+    totalXP += DueIt.computeXP(state.assignments, state.semesterData.rolloverXP);
+    var avgGrade = totalGraded > 0 ? Math.round(gradeSum / totalGraded) : null;
+    var completionRate = totalAssignments > 0 ? Math.round((totalCompleted / totalAssignments) * 100) : 0;
+    var onTimeRate = totalTurnedIn > 0 ? Math.round((totalOnTime / totalTurnedIn) * 100) : 0;
+    var semesterCount = state.semesterData.semesterCount || 0;
+    var lvl = DueIt.computeLevel(totalXP);
+
+    // Find busiest class
+    var busiestClass = '';
+    var busiestCount = 0;
+    for (var cls in allClassCounts) {
+      if (allClassCounts[cls] > busiestCount) { busiestClass = cls; busiestCount = allClassCounts[cls]; }
+    }
+
+    // Type labels
+    var typeLabels = { homework: 'Homework', test: 'Tests', reading: 'Readings', project: 'Projects' };
+
+    // Current badges
+    var badges = DueIt.computeBadges(state.assignments);
+    var unlocked = badges.filter(function (b) { return b.unlocked; });
+
+    var heading = isParent ? first + '\'s Year in Review' : '🎉 ' + first + '\'s Year in Review';
+
+    var html = '';
+
+    // Big number hero
+    html += '<span class="yr-big-number">' + totalAssignments + '</span>';
+    html += '<span class="yr-label">Total Assignments This Year</span>';
+
+    // Core stats
+    html += '<div class="yr-stats">';
+    html += '<div class="yr-stat"><span class="yr-stat-value">' + totalCompleted + '</span><span class="yr-stat-label">Completed</span></div>';
+    html += '<div class="yr-stat"><span class="yr-stat-value">' + totalTurnedIn + '</span><span class="yr-stat-label">Turned In</span></div>';
+    html += '<div class="yr-stat"><span class="yr-stat-value">' + completionRate + '%</span><span class="yr-stat-label">Completion</span></div>';
+    html += '</div>';
+
+    // Grade stats
+    if (totalGraded > 0) {
+      html += '<h3>📊 Grades</h3>';
+      html += '<div class="yr-stats">';
+      html += '<div class="yr-stat"><span class="yr-stat-value">' + totalGraded + '</span><span class="yr-stat-label">Graded</span></div>';
+      html += '<div class="yr-stat"><span class="yr-stat-value">' + avgGrade + ' ' + DueIt.getLetterGrade(avgGrade) + '</span><span class="yr-stat-label">Average</span></div>';
+      html += '<div class="yr-stat"><span class="yr-stat-value">' + onTimeRate + '%</span><span class="yr-stat-label">On Time</span></div>';
+      html += '</div>';
+    }
+
+    // XP & Level
+    if (!isParent) {
+      html += '<h3>⭐ XP & Level</h3>';
+      html += '<div class="yr-stats">';
+      html += '<div class="yr-stat"><span class="yr-stat-value">' + totalXP + '</span><span class="yr-stat-label">Total XP</span></div>';
+      html += '<div class="yr-stat"><span class="yr-stat-value">Lv. ' + lvl.level + '</span><span class="yr-stat-label">' + _esc(lvl.title) + '</span></div>';
+      html += '<div class="yr-stat"><span class="yr-stat-value">' + semesterCount + '</span><span class="yr-stat-label">Semesters</span></div>';
+      html += '</div>';
+    } else {
+      html += '<h3>📈 Progress</h3>';
+      html += '<div class="yr-stats">';
+      html += '<div class="yr-stat"><span class="yr-stat-value">' + totalOnTime + '</span><span class="yr-stat-label">On Time</span></div>';
+      html += '<div class="yr-stat"><span class="yr-stat-value">' + semesterCount + '</span><span class="yr-stat-label">Semesters</span></div>';
+      html += '<div class="yr-stat"><span class="yr-stat-value">' + Object.keys(allClassCounts).length + '</span><span class="yr-stat-label">Classes</span></div>';
+      html += '</div>';
+    }
+
+    // Fun facts
+    html += '<h3>🎯 Fun Facts</h3>';
+    if (busiestClass) {
+      html += '<div class="yr-fun-fact">📚 Busiest class: <b>' + _esc(busiestClass) + '</b> with ' + busiestCount + ' assignments</div>';
+    }
+    if (totalOnTime > 0) {
+      html += '<div class="yr-fun-fact">⏰ Turned in ' + totalOnTime + ' assignment' + (totalOnTime !== 1 ? 's' : '') + ' on time!</div>';
+    }
+    // Type breakdown
+    var typeLines = [];
+    for (var tp in allTypeCounts) {
+      typeLines.push((typeLabels[tp] || tp) + ': ' + allTypeCounts[tp]);
+    }
+    if (typeLines.length > 0) {
+      html += '<div class="yr-fun-fact">📝 ' + typeLines.join(' · ') + '</div>';
+    }
+
+    // Badges
+    if (unlocked.length > 0 && !isParent) {
+      html += '<h3>🏆 Badges Earned</h3>';
+      html += '<div class="yr-badges">' + unlocked.map(function (b) { return b.emoji; }).join(' ') + '</div>';
+      html += '<p style="text-align:center;font-size:0.8rem;color:var(--clr-muted)">' + unlocked.length + ' of ' + badges.length + ' badges unlocked</p>';
+    }
+
+    return html;
+  }
+
+  function buildYearReviewText() {
+    var name = (state.preferences.studentName || '').trim();
+    var first = name.split(' ')[0] || 'Student';
+    var history = state.semesterData.history || [];
+    var totalAssignments = 0, totalCompleted = 0, totalTurnedIn = 0, totalGraded = 0, gradeSum = 0;
+
+    history.forEach(function (s) {
+      totalAssignments += s.total || 0;
+      totalCompleted += s.completed || 0;
+      totalTurnedIn += s.turnedIn || 0;
+      totalGraded += s.graded || 0;
+      if (s.avgGrade !== null && s.graded > 0) gradeSum += s.avgGrade * s.graded;
+    });
+    state.assignments.forEach(function (a) {
+      totalAssignments++;
+      if (a.isComplete || a.isStudied) totalCompleted++;
+      if (a.isTurnedIn) totalTurnedIn++;
+      if (typeof a.grade === 'number') { totalGraded++; gradeSum += a.grade; }
+    });
+    var avgGrade = totalGraded > 0 ? Math.round(gradeSum / totalGraded) : null;
+    var totalXP = DueIt.computeXP(state.assignments, state.semesterData.rolloverXP);
+    var lvl = DueIt.computeLevel(totalXP);
+
+    var lines = [];
+    lines.push('📊 ' + first + '\'s Year in Review');
+    lines.push('━━━━━━━━━━━━━━━━━━━━━━━━');
+    lines.push('');
+    lines.push('Total Assignments: ' + totalAssignments);
+    lines.push('Completed: ' + totalCompleted);
+    lines.push('Turned In: ' + totalTurnedIn);
+    if (avgGrade !== null) lines.push('Average Grade: ' + avgGrade + ' ' + DueIt.getLetterGrade(avgGrade));
+    lines.push('Total XP: ' + totalXP + ' (Level ' + lvl.level + ' — ' + lvl.title + ')');
+    lines.push('Semesters: ' + (state.semesterData.semesterCount || 0));
+    lines.push('');
+    lines.push('— DueIt v' + DueIt.APP_VERSION);
+    return lines.join('\n');
+  }
+
+  function openYearReview() {
+    var history = state.semesterData.history || [];
+    var totalAssignments = state.assignments.length;
+    history.forEach(function (s) { totalAssignments += s.total || 0; });
+
+    if (totalAssignments === 0) {
+      alert('No data yet! Add some assignments first.');
+      return;
+    }
+
+    var isParent = state.preferences.mode === 'parent';
+    var name = (state.preferences.studentName || '').trim();
+    var first = name.split(' ')[0] || 'Student';
+    document.getElementById('year-review-title').textContent = isParent
+      ? '📊 ' + first + '\'s Year in Review'
+      : '🎉 Year in Review';
+    document.getElementById('year-review-body').innerHTML = buildYearReviewHtml();
+    document.getElementById('year-review-dialog').showModal();
+  }
+
+  function handleYearReviewPrint() {
+    var html = document.getElementById('year-review-body').innerHTML;
+    var name = (state.preferences.studentName || '').trim();
+    var first = name.split(' ')[0] || 'Student';
+    var win = window.open('', '_blank');
+    win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>' + first + '\'s Year in Review</title>' +
+      '<style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;margin:2rem;color:#2d3436;max-width:600px;margin:2rem auto}' +
+      'h3{color:#4a6cf7;margin:1rem 0 0.4rem}.yr-big-number{font-size:2.5rem;font-weight:700;color:#4a6cf7;display:block;text-align:center}' +
+      '.yr-label{font-size:0.8rem;color:#636e72;text-align:center;display:block;margin-bottom:0.75rem}' +
+      '.yr-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;margin:0.75rem 0}' +
+      '.yr-stat{text-align:center;padding:0.5rem;background:#f4f6f8;border:1px solid #dfe6e9;border-radius:8px}' +
+      '.yr-stat-value{font-size:1.3rem;font-weight:700;color:#4a6cf7;display:block}' +
+      '.yr-stat-label{font-size:0.65rem;color:#636e72;text-transform:uppercase}' +
+      '.yr-fun-fact{background:#f4f6f8;border:1px solid #dfe6e9;border-radius:8px;padding:0.6rem;margin:0.5rem 0;text-align:center;font-size:0.85rem}' +
+      '.yr-badges{text-align:center;font-size:1.5rem;margin:0.5rem 0;letter-spacing:0.2em}</style></head><body>' +
+      '<h1 style="text-align:center">' + _esc(first) + '\'s Year in Review</h1>' + html + '</body></html>');
+    win.document.close();
+    win.focus();
+    win.print();
+  }
+
+  function handleYearReviewShare() {
+    var text = buildYearReviewText();
+    if (navigator.share) {
+      navigator.share({ title: 'Year in Review', text: text }).catch(function () {});
+    } else if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        alert('Copied to clipboard!');
+      });
+    }
   }
 
   function buildStudentHelp() {
@@ -1154,6 +1434,14 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     document.getElementById('semester-close-btn').addEventListener('click', function () {
       document.getElementById('semester-dialog').close();
     });
+
+    // Year in Review
+    document.getElementById('year-review-btn').addEventListener('click', openYearReview);
+    document.getElementById('year-review-close-btn').addEventListener('click', function () {
+      document.getElementById('year-review-dialog').close();
+    });
+    document.getElementById('year-review-print-btn').addEventListener('click', handleYearReviewPrint);
+    document.getElementById('year-review-share-btn').addEventListener('click', handleYearReviewShare);
 
     document.getElementById('mode-toggle-btn').addEventListener('click', function () {
       var newMode = state.preferences.mode === 'parent' ? 'student' : 'parent';
