@@ -826,6 +826,8 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     var dateEl = document.getElementById('semester-date');
     dateEl.value = new Date().toISOString().slice(0, 10);
     updateSemesterPreview();
+    // Close Settings first to avoid nested modal issues
+    document.getElementById('settings-dialog').close();
     document.getElementById('semester-dialog').showModal();
   }
 
@@ -1190,6 +1192,9 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
       alert('No data yet! Add some assignments first.');
       return;
     }
+
+    // Close Settings first to avoid nested modal issues
+    document.getElementById('settings-dialog').close();
 
     var isParent = state.preferences.mode === 'parent';
     var name = (state.preferences.studentName || '').trim();
