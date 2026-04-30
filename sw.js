@@ -14,6 +14,7 @@ var ASSETS = [
   './js/calendar.js',
   './js/gamification.js',
   './js/renderer.js',
+  './js/help.js',
   './js/app.js',
   './icons/icon.svg',
   './icons/icon-maskable.svg'
