@@ -131,15 +131,27 @@ var BADGES = [
     a.forEach(function(x){ types[x.type || 'homework'] = true; });
     return types.homework && types.test && types.reading && types.project;
   }},
-  { id: 'perfect_week', emoji: '💯', name: 'Perfect Week',     desc: 'Complete all assignments due this week', check: function (a) {
-    var now = new Date();
-    var startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
-    var endOfWeek = new Date(startOfWeek.getTime() + 7 * 86400000);
-    var dueThisWeek = a.filter(function(x){ var d = new Date(x.dueDate); return d >= startOfWeek && d < endOfWeek; });
-    return dueThisWeek.length > 0 && dueThisWeek.every(function(x){ return x.isComplete || x.isStudied; });
-  }},
+  { id: 'perfect_week', emoji: '💯', name: 'Perfect Week',     desc: 'Complete all assignments due in a week',
+    tiers: [1, 3, 5, 10],
+    count: function (a) {
+      // Count distinct weeks where all due assignments were completed
+      var weekMap = {};
+      a.forEach(function(x) {
+        var d = new Date(x.dueDate);
+        var startOfWeek = new Date(d.getFullYear(), d.getMonth(), d.getDate() - d.getDay());
+        var key = startOfWeek.toISOString().slice(0, 10);
+        if (!weekMap[key]) weekMap[key] = { total: 0, done: 0 };
+        weekMap[key].total++;
+        if (x.isComplete || x.isStudied) weekMap[key].done++;
+      });
+      var count = 0;
+      for (var k in weekMap) { if (weekMap[k].total > 0 && weekMap[k].done === weekMap[k].total) count++; }
+      return count;
+    } },
   { id: 'first_grade',    emoji: '📊', name: 'First Grade',          desc: 'Record your first grade',           check: function (a) { return a.some(function(x){ return typeof x.grade === 'number'; }); } },
-  { id: 'perfect_score',  emoji: '🏆', name: 'Perfect Score',        desc: 'Get a 100 on any assignment',       check: function (a) { return a.some(function(x){ return x.grade === 100; }); } },
+  { id: 'perfect_score',  emoji: '🏆', name: 'Perfect Score',        desc: 'Get a 100',
+    tiers: [1, 3, 5, 10],
+    count: function (a) { return a.filter(function(x){ return x.grade === 100; }).length; } },
   { id: 'scholar_types',  emoji: '🎯', name: 'Well Rounded Scholar', desc: 'Record grades on all 4 types',      check: function (a) {
     var types = {};
     a.forEach(function(x){ if (typeof x.grade === 'number') types[x.type || 'homework'] = true; });
