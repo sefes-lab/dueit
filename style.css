@@ -190,9 +190,14 @@
   border-color: var(--clr-primary);
   background: var(--clr-bg);
 }
+.badge-card.badge-tier-1 { border-color: #cd7f32; }
+.badge-card.badge-tier-2 { border-color: #c0c0c0; }
+.badge-card.badge-tier-3 { border-color: #ffd700; }
+.badge-card.badge-tier-4 { border-color: #b9f2ff; box-shadow: 0 0 6px rgba(185,242,255,0.4); }
 .badge-card.locked { opacity: 0.45; filter: grayscale(0.8); }
 .badge-emoji { font-size: 1.6rem; display: block; margin-bottom: 0.2rem; }
 .badge-name { font-size: 0.75rem; font-weight: 600; display: block; }
+.badge-tier { font-size: 0.7rem; display: block; margin-top: 0.1rem; letter-spacing: 0.1em; }
 .badge-desc { font-size: 0.65rem; color: var(--clr-muted); display: block; margin-top: 0.15rem; }
 
 /* ===== Level-Up Animation ===== */

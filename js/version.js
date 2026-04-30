@@ -1,9 +1,15 @@
 var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {};
 (typeof globalThis !== 'undefined' ? globalThis : window).DueIt = DueIt;
 
-DueIt.APP_VERSION = '0.62';
+DueIt.APP_VERSION = '0.63';
 
 DueIt.VERSION_HISTORY = [
+  {
+    version: '0.63',
+    date: '2026-04-30',
+    description:
+      'Tiered badge system: 13 tiered badges with 4 levels each (bronze ★, silver ★★, gold ★★★, diamond ★★★★) plus 8 single-unlock badges; tier borders and star indicators; progressive descriptions showing current and next thresholds',
+  },
   {
     version: '0.62',
     date: '2026-04-30',

@@ -279,9 +279,15 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
     var badges = DueIt.computeBadges(state.assignments);
     el.innerHTML = badges.map(function (b) {
       var cls = b.unlocked ? 'badge-card unlocked' : 'badge-card locked';
+      if (b.tier >= 4) cls += ' badge-tier-4';
+      else if (b.tier >= 3) cls += ' badge-tier-3';
+      else if (b.tier >= 2) cls += ' badge-tier-2';
+      else if (b.tier >= 1) cls += ' badge-tier-1';
+      var tierHtml = b.tierLabel ? '<span class="badge-tier" style="color:' + b.tierColor + '">' + b.tierLabel + '</span>' : '';
       return '<div class="' + cls + '" title="' + _esc(b.desc) + '">' +
         '<span class="badge-emoji">' + b.emoji + '</span>' +
         '<span class="badge-name">' + _esc(b.name) + '</span>' +
+        tierHtml +
         '<span class="badge-desc">' + _esc(b.desc) + '</span>' +
       '</div>';
     }).join('');

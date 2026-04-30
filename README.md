@@ -59,4 +59,4 @@ Tests use Vitest and cover validation, assignments, classes, countdown, and impo
 
 ## Version
 
-Current: v0.62 — See CHANGELOG.md for full history.
+Current: v0.63 — See CHANGELOG.md for full history.

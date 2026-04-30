@@ -1,5 +1,15 @@
 # DueIt — Version History
 
+## v0.63 — 2026-04-30
+
+- Tiered badge system: 13 badges now have 4 levels each (★ bronze, ★★ silver, ★★★ gold, ★★★★ diamond)
+- 8 single-unlock badges remain (First Seed, Hand It Over, Study Buddy, etc.)
+- Tier-colored borders on badge cards: bronze, silver, gold, diamond glow
+- Star indicators (★ ★★ ★★★ ★★★★) shown under badge names
+- Progressive descriptions show current threshold and next target
+- Tiered badges: High Five, Double Digits, Mailbox Full, Quarter Century, Punctual, Grade Tracker, Honor Roll, Grade Streak, Straight A's, Test Ace, Project Pro, Bookworm Bonus
+- Gentler tier ramps (e.g. High Five: 5 → 10 → 20 → 30)
+
 ## v0.62 — 2026-04-30
 
 - Grade tracking: record grades (0–100) on turned-in assignments and studied tests
