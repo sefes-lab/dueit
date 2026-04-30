@@ -1272,7 +1272,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
       '<p>Level up from Freshman all the way to Legend! 🎉</p>' +
 
       '<h3>🏆 Badges</h3>' +
-      '<p>Unlock badges by hitting milestones — check them out in <b>Settings > Achievements</b>.</p>' +
+      '<p>Unlock badges by hitting milestones — check them out in <b>Settings > Achievements</b>. Many badges have 4 tiers: ★ Bronze, ★★ Silver, ★★★ Gold, ★★★★ Diamond. Keep going to level them up!</p>' +
 
       '<h3>📅 Calendar View</h3>' +
       '<p>Tap the 📅 button in the tracker to see your assignments on a monthly calendar. Colored dots show what\'s due each day.</p>' +
@@ -1281,6 +1281,13 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
       '<p>Tap ⬆️ to share a progress report with your parent or teacher. You can email it, copy it, or use your phone\'s share menu.</p>' +
       '<div class="help-tip">💡 Check the "📎 Attach data" box to include your data file so your parent can see everything in their own DueIt!</div>' +
 
+      '<h3>🎓 School Year</h3>' +
+      '<p>In <b>Settings > School Year</b>:</p>' +
+      '<ul>' +
+        '<li><b>New Semester</b> — Pick a date to archive old assignments. Your XP carries over!</li>' +
+        '<li><b>Year in Review</b> — See all your stats, grades, and badges across the whole year</li>' +
+      '</ul>' +
+
       '<h3>🎨 Make It Yours</h3>' +
       '<p>In <b>Settings</b> (⚙️) you can:</p>' +
       '<ul>' +
@@ -1288,6 +1295,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
         '<li>Set your name and grade</li>' +
         '<li>Add or rename your classes</li>' +
         '<li>Export or import your data</li>' +
+        '<li>🔄 Sync assignments to your calendar app</li>' +
       '</ul>' +
 
       '<h3>🌙 Dark Mode</h3>' +
@@ -1316,6 +1324,7 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
         '<li>Add assignments your child forgot to enter</li>' +
         '<li>Fix incorrect due dates</li>' +
         '<li>Mark items as done if needed</li>' +
+        '<li>Record or update grades</li>' +
         '<li>Remove duplicates or old entries</li>' +
       '</ul>' +
 
@@ -1324,7 +1333,14 @@ var DueIt = (typeof globalThis !== 'undefined' ? globalThis : window).DueIt || {
       '<div class="help-tip">💡 Smart merge means neither side loses work. If your child completed something while you were editing, their newer update wins for that assignment.</div>' +
 
       '<h3>🖨️ Printing Reports</h3>' +
-      '<p>Tap 🖨️ to print a full assignment report with status, due dates, and completion dates.</p>' +
+      '<p>Tap 🖨️ to print a full assignment report with status, due dates, grades, and completion dates.</p>' +
+
+      '<h3>🎓 School Year</h3>' +
+      '<p>In <b>Settings > School Year</b>:</p>' +
+      '<ul>' +
+        '<li><b>New Semester</b> — Archive old assignments by date. XP carries over for your child.</li>' +
+        '<li><b>Year in Review</b> — See consolidated stats, grades, and progress across the year</li>' +
+      '</ul>' +
 
       '<h3>⚙️ Settings</h3>' +
       '<p>In Settings you can:</p>' +
